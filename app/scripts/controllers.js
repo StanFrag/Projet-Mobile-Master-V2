@@ -1,16 +1,51 @@
 'use strict';
 angular.module('Guntherandthehunters.controllers', [])
 
-.controller('DashCtrl', function($scope) {
+/************************/
+/******** CORE **********/
+/************************/
+
+//Coeur de l'application
+.controller('CoreCtrl', function($scope) {
+	//alert('toto')
 })
 
-.controller('FriendsCtrl', function($scope, Friends) {
-  $scope.friends = Friends.all();
+/************************/
+/******* GENERAL ********/
+/***********************/
+
+.controller('MenuCtrl', function($scope) {
 })
 
-.controller('FriendDetailCtrl', function($scope, $stateParams, Friends) {
-  $scope.friend = Friends.get($stateParams.friendId);
+.controller('NotificationsCtrl', function($scope) {
 })
 
-.controller('AccountCtrl', function($scope) {
-});
+.controller('SettingsCtrl', function($scope) {
+})
+
+
+/************************/
+/******* EVENTS *********/
+/************************/
+
+//Constroller de la gestion des événements
+.controller('EventsCtrl', ['$scope', function ($scope) {
+
+
+}])
+
+/************************/
+/******** AUTH **********/
+/************************/
+
+.controller('AuthLoginCtrl', function($scope) {
+})
+
+.controller('AuthRegisterCtrl', function($scope) {
+})
+
+.controller('AuthForgotCtrl', function($scope) {
+})
+
+.controller('AuthUnregisterCtrl', function($scope) {
+})
