@@ -24,4 +24,23 @@ angular.module('Guntherandthehunters.services', [])
       return friends[friendId];
     }
   };
-});
+}).factory('User', ['$http', 'ENV', function($http, ENV) {
+  return {
+      insertUser : function(email, password) {
+         return $http.post('/register?email=' + email + '&password=' + password);
+      },
+      loginUser : function(email, password) {
+         var user = $http.post(ENV.apiEndpoint + '/login?email=' + email + '&password=' + password);
+         return user;
+      },
+      isLoggedIn : function() {
+         return $http.get('/isLogged');
+      },
+      getUser : function() {
+         return $http.get('/getLoggedUser');
+      },
+      logout : function() {
+         return $http.get('/logout');
+      }
+  }
+}]);

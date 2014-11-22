@@ -30,6 +30,11 @@ angular.module('Guntherandthehunters', ['ionic', 'config', 'Guntherandthehunters
       templateUrl: 'templates/layout/core.html'
 
     })
+    .state('auth', {
+      controller : 'AuthCtrl',
+      templateUrl: 'templates/layout/auth.html'
+
+    })
     // setup an abstract state for the tabs directive
     .state('core.events', {
       url: "/events",
@@ -47,7 +52,12 @@ angular.module('Guntherandthehunters', ['ionic', 'config', 'Guntherandthehunters
       }
     })
 
-
+    .state('auth.login', {
+      url: "/login",
+      controller : 'AuthLoginCtrl',
+      templateUrl: 'templates/auth/login.html'
+    })
+    
     .state('core.map', {
       url: "/map",
       templateUrl: 'templates/map.html'
