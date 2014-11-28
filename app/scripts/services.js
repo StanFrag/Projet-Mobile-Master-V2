@@ -24,4 +24,35 @@ angular.module('Guntherandthehunters.services', [])
       return friends[friendId];
     }
   };
-});
+})
+.factory('MenuService', function() {
+
+  var menuItems = [
+    {
+      text: 'Carte',
+      link: '#/map'
+    }, 
+    {
+      text: 'Evènements',
+      link: '#/events'
+    }, 
+    {
+      text: 'Amis',
+      link: '#/friend'
+    }, 
+    {
+      text: 'Parties',
+      link: '#/party'
+    }, 
+    {
+      text: 'Paramètres',
+      link: '#/params'
+    }
+  ];
+
+  return {
+    all: function() {
+      return menuItems;
+    }
+  }
+})

@@ -6,13 +6,20 @@ angular.module('Guntherandthehunters.controllers', [])
 /************************/
 
 //Coeur de l'application
-.controller('CoreCtrl', function($scope) {
-	//alert('toto')
+.controller('CoreCtrl', function($scope, MenuService) {
+	$scope.list = MenuService.all();
+
+	$scope.goTo = function(url){
+		alert(url)
+	}
 })
 
 /************************/
 /******* GENERAL ********/
 /***********************/
+
+.controller('MapCtrl', function($scope) {
+})
 
 .controller('MenuCtrl', function($scope) {
 })

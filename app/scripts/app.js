@@ -27,34 +27,18 @@ angular.module('Guntherandthehunters', ['ionic', 'config', 'Guntherandthehunters
       $stateProvider
     .state('core', {
       controller : 'CoreCtrl',
-      templateUrl: 'templates/layout/core.html'
-
+      templateUrl: '../templates/layout/core.html',
+      
     })
+
     // setup an abstract state for the tabs directive
-    .state('core.events', {
-      url: "/events",
-      controller : 'EventsCtrl',
-      templateUrl: 'templates/events/events.html'
-    })
-
-    .state('core.menu', {
-      url: "/menu",
-      views: {
-        'core-menu': {
-          templateUrl: 'templates/menu.html',
-          controller: 'MenuCtrl'
-        }
-      }
-    })
-
-
     .state('core.map', {
       url: "/map",
-      templateUrl: 'templates/map.html'
+      controller : 'MapCtrl',
+      templateUrl: 'templates/map/map.html'
     })
-    ;
 
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/events');
+  $urlRouterProvider.otherwise('/map');
 });
 
