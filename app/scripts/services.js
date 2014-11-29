@@ -48,6 +48,11 @@ angular.module('Guntherandthehunters.services', [])
       text: 'Paramètres',
       link: '#/params'
     }
+    , 
+    {
+      text: 'Déconnexion',
+      link: 'login'
+    }
   ];
 
   return {
@@ -55,4 +60,21 @@ angular.module('Guntherandthehunters.services', [])
       return menuItems;
     }
   }
+})
+
+.factory('User', function($resource, ENV) {
+
+  return {
+    login: $resource(ENV.apiEndpoint + '/login', {id:'@id'}, {
+      'authenticate': {
+        method:'POST'
+      }
+    }),
+    register: $resource(ENV.apiEndpoint + '/login', {id:'@id'}, {
+      'create': {
+        method:'POST'
+      }
+    }),
+  }
+
 })

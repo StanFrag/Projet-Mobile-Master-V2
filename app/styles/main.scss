@@ -1,1 +1,12 @@
 // Your application styles go here
+.messagesInfo{
+	padding:5px;
+	text-align: center;
+	color:white;
+	&.alert-succes{
+		background-color:#5ACF44;
+	}
+	&.alert-error{
+		background-color:#EF2B2B;
+	}
+}

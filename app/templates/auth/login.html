@@ -1,0 +1,51 @@
+<ion-view title="Authentification">
+  <ion-content class="has-header padding">
+
+    <div class="row">
+      <div class="col col-5"></div>
+      <div class="col col-90">
+
+        <div ng-repeat="message in messagesInfo">
+            <p class="messagesInfo {{message.status}}">
+              <b>
+                {{message.title}}
+              </b>
+              {{message.content}}
+            </p>
+        </div>
+
+        <h1>Login</h1>
+
+        <br>
+        <br>
+        <br>
+
+        <form ng-submit="authenticate(user)">
+
+          <label class="item item-input item-floating-label">
+            <input type="text" placeholder="Login/Email" ng-model="user.login">
+          </label>
+
+          <label class="item item-input item-floating-label">
+            <input type="password" placeholder="Password" ng-model="user.password">
+          </label>
+
+          <br>
+          <br>
+
+          <button type="submit" nav-clear class="button button-full button-dark icon-right ion-ios7-arrow-forward">
+            Connexion
+          </button>
+
+          <button class="button button-full button-dark" ng-click="goToState('register')">
+            Inscription
+          </button>
+
+          <a class="link" ng-click="goToState('forgot')">Mot de passe oublié ?</a>
+        </form>
+      </div>
+      <div class="col col-5"></div>  
+    </div>
+
+  </ion-content>
+</ion-view>

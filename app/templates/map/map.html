@@ -4,14 +4,19 @@
   </ion-content>
 </ion-view>
 
-<ion-footer-bar align-title="center" class="bar-dark">
-  <div class="buttons">
-    <button class="button">Left Button</button>
+<div class="tabs-striped tabs-background-dark tabs-color-assertive">
+  <div class="tabs">
+    <a class="tab-item active" ng-click="doSomething()">
+      <i class="icon ion-home"></i>
+      Test
+    </a>
+    <a class="tab-item" ng-click="doSomething()">
+      <i class="icon ion-star"></i>
+      Favorites
+    </a>
+    <a class="tab-item" ng-click="doSomething()">
+      <i class="icon ion-gear-a"></i>
+      Settings
+    </a>
   </div>
-
-  <h1 class="title">Title!</h1>
-  
-  <div class="buttons" ng-click="doSomething()">
-    <button class="button">Right Button</button>
-  </div>
-</ion-footer-bar>
+</div>

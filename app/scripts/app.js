@@ -8,7 +8,8 @@
 // 'starter.controllers' is found in controllers.js
 angular.module('Guntherandthehunters', ['ionic', 'config', 'Guntherandthehunters.controllers', 'Guntherandthehunters.services'])
 
-.run(function($ionicPlatform) {
+.run(function($ionicPlatform, $rootScope) {
+  $rootScope.messagesInfo = [];
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -23,19 +24,48 @@ angular.module('Guntherandthehunters', ['ionic', 'config', 'Guntherandthehunters
 })
 
 .config(function($stateProvider, $urlRouterProvider) {
+  $stateProvider
 
-      $stateProvider
+    /************************/
+    /******* ABSTRACT *******/
+    /************************/
+
     .state('core', {
       controller : 'CoreCtrl',
-      templateUrl: '../templates/layout/core.html',
-      
+      templateUrl: '../templates/layout/core.html'
     })
 
-    // setup an abstract state for the tabs directive
+    /************************/
+    /******* GENERAL ********/
+    /************************/
+
     .state('core.map', {
       url: "/map",
       controller : 'MapCtrl',
       templateUrl: 'templates/map/map.html'
+    })
+
+
+    /************************/
+    /******** AUTH **********/
+    /************************/
+
+    .state('login', {
+      url: "/login",
+      controller : 'AuthLoginCtrl',
+      templateUrl: 'templates/auth/login.html'
+    })
+
+    .state('register', {
+      url: "/register",
+      controller : 'AuthRegisterCtrl',
+      templateUrl: 'templates/auth/register.html'
+    })
+
+    .state('forgot', {
+      url: "/forgot",
+      controller : 'AuthForgotCtrl',
+      templateUrl: 'templates/auth/forgot.html'
     })
 
   // if none of the above states are matched, use this as the fallback
