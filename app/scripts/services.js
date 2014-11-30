@@ -1,5 +1,5 @@
 'use strict';
-angular.module('Guntherandthehunters.services', [])
+angular.module('Guntherandthehunters.services', ['ngResource'])
 
 /**
  * A simple example service that returns some data.
@@ -30,27 +30,34 @@ angular.module('Guntherandthehunters.services', [])
   var menuItems = [
     {
       text: 'Carte',
-      link: '#/map'
+      link: 'core.map'
     }, 
     {
-      text: 'Evènements',
-      link: '#/events'
+      text: 'Evenements',
+      link: 'core.events'
     }, 
     {
       text: 'Amis',
-      link: '#/friend'
+      link: 'core.friends'
     }, 
     {
       text: 'Parties',
-      link: '#/party'
+      link: 'core.party'
     }, 
     {
-      text: 'Paramètres',
-      link: '#/params'
-    }
-    , 
+      text: 'Parametres',
+      link: 'core.params'
+    },
     {
-      text: 'Déconnexion',
+      text: 'Classement',
+      link: 'core.rank'
+    },
+    {
+      text: 'Regles',
+      link: 'core.rules'
+    },
+    {
+      text: 'Deconnexion',
       link: 'login'
     }
   ];
@@ -65,16 +72,22 @@ angular.module('Guntherandthehunters.services', [])
 .factory('User', function($resource, ENV) {
 
   return {
-    login: $resource(ENV.apiEndpoint + '/login', {id:'@id'}, {
+    login: $resource(ENV.apiEndpoint + 'login', {email: '@email', password:'@password' }, {
       'authenticate': {
         method:'POST'
       }
     }),
-    register: $resource(ENV.apiEndpoint + '/login', {id:'@id'}, {
+    verifLogin: $resource(ENV.apiEndpoint + 'isLogged', {}, {
+      'isLogged': {
+        method:'GET'
+      }
+    }),
+    register: $resource(ENV.apiEndpoint + 'login', {id:'@id'}, {
       'create': {
         method:'POST'
       }
-    }),
+    }),    
+
   }
 
 })

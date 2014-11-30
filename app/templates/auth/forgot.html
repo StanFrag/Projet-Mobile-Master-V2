@@ -1,18 +1,19 @@
-<ion-view title="Inscription">
+<ion-view title="Inscription" id="loginContener">
   <ion-content class="has-header padding">
 
     <div class="row">
       <div class="col col-5"></div>
       <div class="col col-90">
 
-        <h1>Récupération du Mot de passe</h1>
+        <h1 class="greenGame">Recuperer votre mot de passe</h1>
 
         <br>
         <br>
         <br>
 
-        <label class="item item-input item-floating-label">
-          <input type="email" placeholder="Entrez votre Email...">
+        <span class="input-label loginLabel">Email :</span>
+        <label class="item item-input">
+          <input  type="email" placeholder="Entrez votre Email..." ng-model="user.login">
         </label>
 
         <br>

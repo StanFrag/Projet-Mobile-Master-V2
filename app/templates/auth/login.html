@@ -1,9 +1,9 @@
-<ion-view title="Authentification">
-  <ion-content class="has-header padding">
+<ion-view title="Authentification" id="loginContener">
+  <ion-content class="has-header padding" >
 
     <div class="row">
-      <div class="col col-5"></div>
-      <div class="col col-90">
+      <div class="col col-10"></div>
+      <div class="col col-80">
 
         <div ng-repeat="message in messagesInfo">
             <p class="messagesInfo {{message.status}}">
@@ -14,7 +14,7 @@
             </p>
         </div>
 
-        <h1>Login</h1>
+        <h1 class="greenGame">Connexion</h1>
 
         <br>
         <br>
@@ -22,18 +22,20 @@
 
         <form ng-submit="authenticate(user)">
 
-          <label class="item item-input item-floating-label">
-            <input type="text" placeholder="Login/Email" ng-model="user.login">
+          <span class="input-label loginLabel">Login/Email :</span>
+          <label class="item item-input">
+            <input class="pull-right" type="text" placeholder="login ou email..." ng-model="user.login">
           </label>
 
-          <label class="item item-input item-floating-label">
-            <input type="password" placeholder="Password" ng-model="user.password">
+          <span class="input-label loginLabel">Password :</span>
+          <label class="item item-input">
+            <input  type="password" placeholder="password...." ng-model="user.password">
           </label>
 
           <br>
           <br>
 
-          <button type="submit" nav-clear class="button button-full button-dark icon-right ion-ios7-arrow-forward">
+          <button type="submit" class="button button-full button-dark icon-right ion-ios7-arrow-forward">
             Connexion
           </button>
 
@@ -41,11 +43,10 @@
             Inscription
           </button>
 
-          <a class="link" ng-click="goToState('forgot')">Mot de passe oublié ?</a>
+          <a class="link loginLink" ng-click="goToState('forgot')">Mot de passe oublié ?</a>
         </form>
       </div>
-      <div class="col col-5"></div>  
+      <div class="col col-10"></div>  
     </div>
-
   </ion-content>
 </ion-view>

@@ -45,6 +45,41 @@ angular.module('Guntherandthehunters', ['ionic', 'config', 'Guntherandthehunters
       templateUrl: 'templates/map/map.html'
     })
 
+    .state('core.events', {
+      url: "/events",
+      controller : 'EventsCtrl',
+      templateUrl: 'templates/events/events.html'
+    })
+
+    .state('core.friends', {
+      url: "/friends",
+      controller : 'FriendsCtrl',
+      templateUrl: 'templates/friends/friends.html'
+    })
+
+    .state('core.party', {
+      url: "/party",
+      controller : 'PartyCtrl',
+      templateUrl: 'templates/party/party.html'
+    })
+
+    .state('core.params', {
+      url: "/params",
+      controller : 'ParamsCtrl',
+      templateUrl: 'templates/params/params.html'
+    })
+
+    .state('core.rank', {
+      url: "/rank",
+      controller : 'RankCtrl',
+      templateUrl: 'templates/rank/rank.html'
+    })
+
+    .state('core.rules', {
+      url: "/rules",
+      controller : 'RulesCtrl',
+      templateUrl: 'templates/rules/rules.html'
+    })
 
     /************************/
     /******** AUTH **********/

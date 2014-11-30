@@ -1,32 +1,39 @@
-<ion-view title="Inscription">
+<ion-view title="Inscription" id="loginContener">
   <ion-content class="has-header padding">
 
     <div class="row">
       <div class="col col-5"></div>
       <div class="col col-90">
 
-        <h1>Inscription</h1>
+        <h1 class="greenGame">Inscription</h1>
 
         <br>
         <br>
         <br>
 
-        <label class="item item-input item-floating-label">
-          <input type="text" placeholder="Login">
+        <span class="input-label loginLabel">Login :</span>
+        <label class="item item-input">
+          <input  type="text" placeholder="Entrez votre Login..." ng-model="user.login">
         </label>
-        <br>
-        <label class="item item-input item-floating-label">
-          <input type="email" placeholder="Email">
+
+        <span class="input-label loginLabel">Email :</span>
+        <label class="item item-input">
+          <input  type="email" placeholder="Entrez votre Email..." ng-model="user.email">
         </label>
-        <label class="item item-input item-floating-label">
-          <input type="email" placeholder="Repetez Email">
+
+        <span class="input-label loginLabel">Repetez Email :</span>
+        <label class="item item-input">
+          <input  type="email" placeholder="Repetez votre Email..." ng-model="user.emailVerif">
         </label>
-        <br>
-        <label class="item item-input item-floating-label">
-          <input type="password" placeholder="Password">
+
+        <span class="input-label loginLabel">Mot de passe :</span>
+        <label class="item item-input">
+          <input  type="password" placeholder="Entrez votre Mot de passe..." ng-model="user.password">
         </label>
-        <label class="item item-input item-floating-label">
-          <input type="password" placeholder="Repetez password">
+
+        <span class="input-label loginLabel">Repetez mot de passe :</span>
+        <label class="item item-input">
+          <input  type="password" placeholder="Repetez votre Mot de passe..." ng-model="user.passwordVerif">
         </label>
 
         <br>
