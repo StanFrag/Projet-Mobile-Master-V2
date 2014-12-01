@@ -1,0 +1,29 @@
+<ion-modal-view class="modal" ng-controller="ChatCtrl">
+	<ion-header-bar>
+	  <h1 class="title">Chat</h1>
+	  <div class="button button-clear" ng-click="modal.hide()"><span class="icon ion-close"></span></div>
+	</ion-header-bar>
+	<ion-content>
+		<div class="row">
+		    <div class="col col-5"></div>
+		    <div class="col col-90">
+		    	<ion-list>
+		    		<button class="ion-minus-circled"
+                       ng-click="clearChat()">
+    				</button>
+					<ion-item ng-repeat="message in messages">
+				    	{{message.content}}   [{{message.time}}]
+					</ion-item>
+				</ion-list>
+			    <form ng-submit="addMessage(message)">
+		        	<label class="item item-input">
+		        		<input class="pull-right" type="text" placeholder="entrez votre message..." ng-model="message">
+		        	</label>
+		        	<button type="submit" class="button button-full button-dark icon-right ion-ios7-arrow-forward">
+			            Envoyer
+			        </button>
+		        </form>
+		    </div>
+		    <div class="col col-5"></div>
+	</ion-content>
+</ion-modal-view>

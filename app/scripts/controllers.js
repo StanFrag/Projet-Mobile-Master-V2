@@ -1,5 +1,5 @@
 'use strict';
-angular.module('Guntherandthehunters.controllers', [])
+angular.module('Guntherandthehunters.controllers', ['ngMap'])
 
 /************************/
 /******** CORE **********/
@@ -21,7 +21,7 @@ angular.module('Guntherandthehunters.controllers', [])
 /******* GENERAL ********/
 /***********************/
 
-.controller('MapCtrl', ['$scope', '$ionicLoading', 'User', function($scope, $ionicLoading, User) {
+.controller('MapCtrl', ['$scope', '$ionicModal', '$ionicLoading', 'User', function($scope, $ionicModal, $ionicLoading, User) {
 	var promise = User.verifLogin.isLogged();
 
 	promise.$promise.then(function(result){
@@ -34,26 +34,60 @@ angular.module('Guntherandthehunters.controllers', [])
 		console.log(error);
 	})
 
-    var myLatlng = new google.maps.LatLng(37.3000, -120.4833);
+	$scope.positions = [{
+    	lat: 43.07493,
+    	lng: -89.381388
+	}];
 
-    var mapOptions = {
-        center: myLatlng,
-        zoom: 16,
-        mapTypeId: google.maps.MapTypeId.ROADMAP
-    };
+	$scope.$on('mapInitialized', function(event, map) {
+		$scope.map = map;
+	});
 
-    var map = new google.maps.Map(document.getElementById("map"), mapOptions);
+	$scope.centerOnMe= function(){
 
-    navigator.geolocation.getCurrentPosition(function(pos) {
-        map.setCenter(new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
-        var myLocation = new google.maps.Marker({
-            position: new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude),
-            map: map,
-            title: "My Location"
-        });
-    });
+		$scope.positions = [];
 
-    $scope.map = map;
+		$ionicLoading.show({
+			template: 'Loading...'
+		});
+
+		navigator.geolocation.getCurrentPosition(function(position) {
+			var pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+			$scope.positions.push({lat: pos.k,lng: pos.B});
+			console.log(pos);
+			$scope.map.setCenter(pos);
+			$ionicLoading.hide();
+		});
+	};
+
+	$ionicModal.fromTemplateUrl('templates/chat/chat.html', function($ionicModal) {
+	    $scope.modal = $ionicModal;
+	},{
+	    // Use our scope for the scope of the modal to keep it simple
+	    scope: $scope,
+	    // The animation we want to use for the modal entrance
+	    animation: 'slide-in-up'
+	});
+
+}])
+
+.controller('ChatCtrl', ['$scope', function ($scope) {
+
+	$scope.messages = [];
+
+	$scope.addMessage = function(item){
+
+		var d = new Date();
+		var hour = d.getHours();
+		var minute = d.getMinutes();
+		var timeItem = ""+hour +":"+minute+"";
+		
+		$scope.messages.push({content:item, time:timeItem});
+	}
+
+	$scope.clearChat = function(){
+		$scope.messages = [];
+	}
 
 }])
 

@@ -51,7 +51,7 @@ h1{
 }
 
 /**************************/
-/******** ALERTES *********/
+/******** AUTH ************/
 /**************************/
 
 
@@ -93,14 +93,26 @@ h1{
 /********** MAP **********/
 /**************************/
 
-.scroll {
-    height: 100%;
+map {
+  width: 100%;
+  height: 100% !important;
+  cursor: url('http://ionicframework.com/img/finger.png'), auto;
+  z-index:100;
 }
- 
-#map {
-	margin-top:-10px;
-	margin-left:-10px;
-	margin-right:5px;
-    width: 105%;
-    height: 100%;
+
+.scroll, .mapWrap {
+  height: 100%;
+}
+
+/**************************/
+/********** CHAT *********/
+/**************************/
+
+.modal{
+	position:absolute;
+	margin:0;
+	top:0;
+	left:0;
+	background-color:transparent;
+	z-index:100;
 }

@@ -22,6 +22,7 @@ module.exports = function (grunt) {
       // configurable paths
       app: 'app',
       scripts: 'scripts',
+      templates: 'templates',
       styles: 'styles',
       images: 'images'
     },
@@ -41,7 +42,7 @@ module.exports = function (grunt) {
         constants: {
           ENV: {
             name: 'development',
-            apiEndpoint: 'http://dev.yoursite.com:10000/'
+            apiEndpoint: 'http://localhost:3000/'
           }
         }
       },

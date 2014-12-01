@@ -1,14 +1,23 @@
 <ion-view title="Carte" id="loginContener">
-  <ion-content class="has-header padding">
-    <div id="map" data-tap-disabled="true"></div>
+  <ion-content class="has-header" scroll="false">
+    <div class="mapWrap"  data-tap-disabled="true">
+      <map center="43.07493,-89.381388" zoom="15" disable-default-u-i="true">
+        <shape name="circle" radius="400" center="[pos.lat,pos.lng]" radius="4000" />
+        <marker ng-repeat=" pos in positions" position="{{pos.lat}},{{pos.lng}}"></marker>
+      </map> 
+    </div>
   </ion-content>
 </ion-view>
 
 <div class="tabs-striped tabs-background-dark tabs-color-assertive">
   <div class="tabs">
-    <a class="tab-item active" ng-click="doSomething()">
-      <i class="icon ion-home"></i>
-      Test
+    <a class="tab-item" ng-click="centerOnMe()">
+      <i class="icon ion-pinpoint"></i>
+      Recentrer
+    </a>
+    <a class="tab-item" ng-click="modal.show()">
+      <i class="icon ion-chatbubbles"></i>
+      Chat
     </a>
     <a class="tab-item" ng-click="doSomething()">
       <i class="icon ion-star"></i>
@@ -20,3 +29,4 @@
     </a>
   </div>
 </div>
+
