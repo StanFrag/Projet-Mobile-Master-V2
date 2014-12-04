@@ -1,32 +1,41 @@
 <ion-view title="Carte" id="loginContener">
   <ion-content class="has-header" scroll="false">
     <div class="mapWrap"  data-tap-disabled="true">
-      <map center="43.07493,-89.381388" zoom="15" disable-default-u-i="true">
-        <shape name="circle" radius="400" center="[pos.lat,pos.lng]" radius="4000" />
-        <marker ng-repeat=" pos in positions" position="{{pos.lat}},{{pos.lng}}"></marker>
+      <map center="44.863702,-0.555980" 
+            zoom="16"
+            disable-default-u-i="true"
+            disable-double-click-zoom="false"
+            draggable="true"
+            draggable-cursor="finger"
+            dragging-cursor="move"
+            keyboard-shortcuts="false"
+            max-zoom="20"
+            min-zoom="12"
+            tilt="45">
+        <marker ng-repeat="infoPlayer in player"
+          position="{{infoPlayer.posX}},{{infoPlayer.posY}}" 
+          icon="{{infoPlayer.icone}}"
+          on-click="{{infoPlayer.click}}"
+          animation="{{infoPlayer.anim}}"
+          draggable="false"
+          class="player">
+        <marker ng-repeat="infoEnnemy in ennemy"
+          position="{{infoEnnemy.posX}},{{infoEnnemy.posY}}" 
+          icon="{{infoEnnemy.icone}}"
+          on-click="{{infoEnnemy.click}}"
+          animation="{{infoEnnemy.anim}}"
+          draggable="false">
+        </marker>
       </map> 
     </div>
   </ion-content>
 </ion-view>
 
 <div class="tabs-striped tabs-background-dark tabs-color-assertive">
-  <div class="tabs">
-    <a class="tab-item" ng-click="centerOnMe()">
-      <i class="icon ion-pinpoint"></i>
-      Recentrer
-    </a>
-    <a class="tab-item" ng-click="modal.show()">
-      <i class="icon ion-chatbubbles"></i>
-      Chat
-    </a>
-    <a class="tab-item" ng-click="doSomething()">
-      <i class="icon ion-star"></i>
-      Favorites
-    </a>
-    <a class="tab-item" ng-click="doSomething()">
-      <i class="icon ion-gear-a"></i>
-      Settings
+  <div class="tabs" >
+    <a ng-repeat="itemFooter in itemsFooter" class="{{itemFooter.classe}}" ng-click="{{itemFooter.clickAction}}">
+      <i class="icon {{itemFooter.icone}}"></i>
+      {{itemFooter.titre}}
     </a>
   </div>
 </div>
-

@@ -1,0 +1,34 @@
+{
+  "boutons": [{
+    "text": "Carte",
+    "link": "core.map"
+  }, 
+  {
+    "text": "Evenements",
+    "link": "core.events"
+  }, 
+  {
+    "text": "Amis",
+    "link": "core.friends"
+  }, 
+  {
+    "text": "Parties",
+    "link": "core.party"
+  }, 
+  {
+    "text": "Parametres",
+    "link": "core.params"
+  },
+  {
+    "text": "Classement",
+    "link": "core.rank"
+  },
+  {
+    "text": "Regles",
+    "link": "core.rules"
+  },
+  {
+    "text": "Deconnexion",
+    "link": "login"
+  }], "count":8
+}

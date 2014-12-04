@@ -76,6 +76,10 @@ h1{
 /********** MENU **********/
 /**************************/
 
+#menu{
+	background-color:#2E2E2E;
+}
+
 .listItemMenu{
 	font-family:digital;
 	font-size:12px;
@@ -84,9 +88,9 @@ h1{
 	padding: 0;
 	padding-top:15px;
 	padding-bottom:15px;
-	background-color:#4B4B4B;
 	border: 1px solid #ffffff;
 	color:white;
+	background-color:#4A4A4A;
 }
 
 /**************************/
@@ -98,10 +102,40 @@ map {
   height: 100% !important;
   cursor: url('http://ionicframework.com/img/finger.png'), auto;
   z-index:100;
+
+  -moz-box-shadow: inset 0px 0px 100px 0px #000000;
+-webkit-box-shadow: inset 0px 0px 100px 0px #000000;
+-o-box-shadow: inset 0px 0px 100px 0px #000000;
+box-shadow: inset 0px 0px 100px 0px #000000;
+filter:progid:DXImageTransform.Microsoft.Shadow(color=#000000, Direction=NaN, Strength=100);
 }
 
 .scroll, .mapWrap {
   height: 100%;
+}
+
+.tabs-striped.tabs-color-assertive .tab-item {
+color: #919D80;
+opacity: 1;
+}
+
+tab-item.tab-item-active, .tabs-striped.tabs-color-assertive .tab-item.active, .tabs-striped.tabs-color-assertive .tab-item.activated{
+color: #A4FF49;
+opacity: 1;
+border-top: 2px solid #A4FF49;
+}
+
+tab-item:active{
+color: #A4FF49;
+opacity: 1;
+border-top: 2px solid #A4FF49;
+}
+
+.itemActivated{
+color: #A4FF49 !important;
+opacity: 1 !important;
+border-top: 2px solid #A4FF49 !important;
+margin-top:-2px;
 }
 
 /**************************/

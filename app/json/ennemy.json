@@ -1,0 +1,98 @@
+[
+	{
+		"posX":44.863702,
+		"posY":-0.555980,
+		"icone":
+			{
+				"path":"CIRCLE", 
+	            "fillColor": "#F52121",
+	            "fillOpacity":1, 
+	            "scale": 5, 
+	            "strokeColor":"#1D1D1D",
+	            "strokeOpacity":1,
+	            "strokeWeight":1
+	        },
+	    "anim":"DROP",
+	    "click": ""
+	},
+	{
+		"posX":44.863702,
+		"posY":-0.585580,
+		"icone":
+			{
+				"path":"CIRCLE", 
+	            "fillColor": "#F52121",
+	            "fillOpacity":1, 
+	            "scale": 5, 
+	            "strokeColor":"#1D1D1D",
+	            "strokeOpacity":1,
+	            "strokeWeight":1
+	        },
+	    "anim":"DROP",
+	    "click": ""
+	},
+	{
+		"posX":44.869702,
+		"posY":-0.585580,
+		"icone":
+			{
+				"path":"CIRCLE", 
+	            "fillColor": "#F52121",
+	            "fillOpacity":1, 
+	            "scale": 5, 
+	            "strokeColor":"#1D1D1D",
+	            "strokeOpacity":1,
+	            "strokeWeight":1
+	        },
+	    "anim":"DROP",
+	    "click": ""
+	},
+	{
+		"posX":44.866502,
+		"posY":-0.585950,
+		"icone":
+			{
+				"path":"CIRCLE", 
+	            "fillColor": "#F52121",
+	            "fillOpacity":1, 
+	            "scale": 5, 
+	            "strokeColor":"#1D1D1D",
+	            "strokeOpacity":1,
+	            "strokeWeight":1
+	        },
+	    "anim":"DROP",
+	    "click": ""
+	},
+	{
+		"posX":44.868972,
+		"posY":-0.575950,
+		"icone":
+			{
+				"path":"CIRCLE", 
+	            "fillColor": "#F52121",
+	            "fillOpacity":1, 
+	            "scale": 5, 
+	            "strokeColor":"#1D1D1D",
+	            "strokeOpacity":1,
+	            "strokeWeight":1
+	        },
+	    "anim":"DROP",
+	    "click": ""
+	},
+	{
+		"posX":44.866502,
+		"posY":-0.585950,
+		"icone":
+			{
+				"path":"CIRCLE", 
+	            "fillColor": "#F52121",
+	            "fillOpacity":1, 
+	            "scale": 5, 
+	            "strokeColor":"#1D1D1D",
+	            "strokeOpacity":1,
+	            "strokeWeight":1
+	        },
+	    "anim":"DROP",
+	    "click": ""
+	}
+]
