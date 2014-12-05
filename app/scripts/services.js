@@ -4,22 +4,36 @@ angular.module('Guntherandthehunters.services', ['ngResource'])
 .factory('User', function($resource, ENV) {
 
   return {
-    login: $resource(ENV.apiEndpoint + 'login', {email: '@email', password:'@password' }, {
-      'authenticate': {
-        method:'POST'
+    forgot : $resource(ENV.apiEndpoint + 'external/forgot', {email: '@email' }, {
+        'resetPassword': {
+          method: 'POST' 
+        }
+      }),
+    login : $resource(ENV.apiEndpoint + 'external/login', {email: '@email', password:'@password' }, {
+        'loginUser': {
+          method: 'POST' 
+        }
+      }), 
+    isLoggedIn : $resource(ENV.apiEndpoint + 'external/isLogged', {access_token: '@access_token'}, {
+      'isLoggedIn': {
+        method: 'POST' 
       }
     }),
-    verifLogin: $resource(ENV.apiEndpoint + 'isLogged', {}, {
-      'isLogged': {
-        method:'GET'
+    getUser : $resource(ENV.apiEndpoint + 'external/getLoggedUser', {}, {
+      'getLoggedUser': {
+        method: 'GET' 
       }
     }),
-    register: $resource(ENV.apiEndpoint + 'login', {id:'@id'}, {
+    register : $resource(ENV.apiEndpoint + 'external/register', {username: '@username', email: '@email', password:'@password'}, {
       'create': {
-        method:'POST'
+        method: 'POST' 
       }
     }),
-
+    logout : $resource(ENV.apiEndpoint + 'external/logout', {}, {
+      'logout': {
+        method: 'GET' 
+      }
+    })
   }
 
 })

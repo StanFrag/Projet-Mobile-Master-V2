@@ -85,21 +85,23 @@ angular.module('Guntherandthehunters', ['ionic', 'config', 'Guntherandthehunters
     /******** AUTH **********/
     /************************/
 
-    .state('login', {
+    .state('auth', {
+      templateUrl: '../templates/auth/auth.html'
+    })
+
+    .state('auth.login', {
       url: "/login",
       controller : 'AuthLoginCtrl',
       templateUrl: 'templates/auth/login.html'
     })
 
-    .state('register', {
+    .state('auth.register', {
       url: "/register",
-      controller : 'AuthRegisterCtrl',
       templateUrl: 'templates/auth/register.html'
     })
 
-    .state('forgot', {
+    .state('auth.forgot', {
       url: "/forgot",
-      controller : 'AuthForgotCtrl',
       templateUrl: 'templates/auth/forgot.html'
     })
 

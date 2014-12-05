@@ -16,17 +16,19 @@ app.controller('CoreCtrl', function($scope, $http, User) {
     	$scope.list = data.boutons;
     });
 
-	// On verifie si l'utilisateur est connecté
-    var promise = User.verifLogin.isLogged();
-	promise.$promise.then(function(result){
-		if(result.error != undefined){
-			console.log(result);
-		}else{
-			console.log(result);
-		}
-	},function(error){
-		console.log(error);
-	});
+	var tok = localStorage.getItem('token');
+	console.log("Recuperation en LocalStorage du token: ",tok);
+
+	if(tok != undefined && tok != null){
+		var tempUser = User.isLoggedIn.isLoggedIn({access_token : tok});
+	  	tempUser.$promise.then(function(result) {
+	  		if(!result.isLoggedIn){
+	  			$scope.goToState('auth.login');
+	  		}	
+	  	});
+  	}else{
+  		$scope.goToState('auth.login');
+  	}
 })
 
 // Controller general à l'ensemble de l'application
@@ -71,7 +73,6 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPla
 	$scope.$on('mapInitialized', function(event, map) {
 		//Récuperation du style de map en json
 		$http.get('../json/mapStyle.json').success(function(data){
-			console.log("Recuperation du style de la carte et initialisation de la map")
 			// Création du style de la map
 	    	var roadGuntherStyles = data;
 	    	var styledMapOptions = {name: 'FR Gunther style'};
@@ -82,7 +83,7 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPla
 			// Ajout de la map
 			$scope.map = map;
 			// Fonction de geolocalisation du player
-			$scope.centerOnMe();
+			$scope.initiatePlayer();
 	    });
 	});
 
@@ -116,6 +117,15 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPla
 
 	// Centrer la map et le joueur sur la position géolocalisé
 	$scope.centerOnMe= function(){
+		var tmpPos = $scope.positionsPlayer.length - 1;
+		var pos = new google.maps.LatLng($scope.positionsPlayer[tmpPos].lat, $scope.positionsPlayer[tmpPos].lng);
+		//$scope.activeItem[0];
+		$scope.map.setCenter(pos);
+		
+	}
+
+	// Centrer la map et le joueur sur la position géolocalisé
+	$scope.initiatePlayer= function(){
 
 		// On affiche la barre de chargement
 		$ionicLoading.show({
@@ -126,28 +136,22 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPla
 		$ionicPlatform.ready(function() {
 			// On recherche la position actuel de l'utilisateur
 			navigator.geolocation.getCurrentPosition(function(position) {
-
 				// On crée une nouvelle position google map
 				var pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
 				// On retire du tableau des markers le marker du joueur precedent
 				$scope.ennemy = [];
 				// On rerajoute le joueur a sa nouvelle position
-				if($scope.player.length == 0){
-					$scope.addPlayer(position.coords.latitude,position.coords.longitude);
-					$scope.map.setCenter(pos);
-				}else{
-					$scope.movePlayer(pos);
-				}
+				$scope.addPlayer(position.coords.latitude,position.coords.longitude);
+				$scope.map.setCenter(pos);
 				// On rerajoute le joueur a sa nouvelle position
 				$scope.addEnnemy();
 				// On push ces positions dans le tableau de position
 				$scope.positionsPlayer.push({lat: pos.k,lng: pos.B});
-
 				// On cache la barre de chargement
 				$ionicLoading.hide();				
-			}, function(){
+			}, function(error){
 				// Si les données de géolocalisation sont inexistante ou desactivé, on previens l'utilisateur
-				alert("Pas de données trouvé, veuillez activer la géolocalisation sur votre mobile pour pouvoir jouer");
+				alert('code: ' + error.code + '\n' + 'message: ' + error.message + '\n');
 				// On cache la barre de chargement
 				$ionicLoading.hide();
 			});
@@ -160,12 +164,12 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPla
 			$scope.movePlayer(pos);
 		}
 	}, function(error){
-		console.log(error);
-		alert(error);
-	});
+		alert('code: '    + error.code    + '\n' + 'message: ' + error.message + '\n');
+	},{ maximumAge: 5000, timeout: 10000, enableHighAccuracy: true });
 
 	$scope.movePlayer = function(pos){
 		var tmpObj = $scope.map.markers[0];
+		$scope.positionsPlayer.push({lat: pos.k,lng: pos.B});
         tmpObj.animateTo(
         	pos, 
 			{
@@ -241,43 +245,60 @@ app.controller('RulesCtrl', function ($scope) {})
 /******** AUTH **********/
 /************************/
 
+app.controller('AuthCtrl', function($scope, $state, $rootScope, User) {
+
+	var tok = localStorage.getItem('token');
+
+	console.log("Recuperation en LocalStorage du token: ",tok);
+
+	if(tok != undefined && tok != null){
+		var tempUser = User.isLoggedIn.isLoggedIn({access_token : tok});
+		tempUser.$promise.then(function(result) {
+	  		if(result.isLoggedIn){
+	  			$scope.goToState('core.map');
+	  		}
+	  	});
+	}
+})
+
 app.controller('AuthLoginCtrl', function($scope, $state, $rootScope, User) {
 
 	$scope.user = {};
 
-	$scope.messagesInfo = $rootScope.messagesInfo;
+	$scope.messagesInfo = $rootScope.messagesInfo;	
 
 	$scope.authenticate = function(params){
-
+		console.log("login envoyé")
 		if(params.login == undefined){
+
 			$rootScope.messagesInfo.push({title: "Attention !", content: "Veuillez saisir un Login valide!", status: "alert-error"});
+
 		}else if(params.password == undefined){
+
 			$rootScope.messagesInfo.push({title: "Attention !", content: "Veuillez saisir un Mot de passe valide!", status: "alert-error"});
+
 		}else{
-			var promise = User.login.authenticate({email: params.login, password: params.password});
+
+			var promise = User.login.loginUser({email: params.login, password: params.password});
 
 			promise.$promise.then(function(result){
-				if(result.error != undefined){
-					console.log(result.error);
+				console.log(result);
+				if(result.error) {
 					$rootScope.messagesInfo.push({title: "Error !", content: result.error, status: "alert-error"});
-				}else{
-					//console.log(result.user);
+				} else if(result.user) {
+					console.log();
+					$rootScope.messagesInfo.push({title: "Succès !", content: result.user, status: "alert-succes"});
+					localStorage.setItem("token", result.user.token);
+					console.log("Insert en LocalStorage du token: ",result.user.token);
 					$state.go('core.map');
 				}
-			}, function(error){
+			}, 
+			function(error){
 				console.log(error);
 				$rootScope.messagesInfo.push({title: "Error !", content: error, status: "alert-error"});
 			})
+
 		}
 
 	}
-})
-
-app.controller('AuthRegisterCtrl', function($scope) {
-})
-
-app.controller('AuthForgotCtrl', function($scope) {
-})
-
-app.controller('AuthUnregisterCtrl', function($scope) {
 })
