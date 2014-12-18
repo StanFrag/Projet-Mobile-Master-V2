@@ -4,16 +4,7 @@
     <div class="row">
       <div class="col col-10"></div>
       <div class="col col-80">
-
-        <div ng-repeat="message in messagesInfo">
-            <p class="messagesInfo {{message.status}}">
-              <b>
-                {{message.title}}
-              </b>
-              {{message.content}}
-            </p>
-        </div>
-
+      
         <img src="../../images/iconemobile.svg" style="width:100%;">
 
         <h1 class="greenGame">Connexion</h1>
@@ -39,7 +30,7 @@
             Inscription
           </button>
 
-          <a class="link loginLink" ng-click="goToState('forgot')">Mot de passe oublié ?</a>
+          <a class="link loginLink" ng-click="goToState('auth.forgot')">Mot de passe oublié ?</a>
         </form>
       </div>
       <div class="col col-10"></div>  

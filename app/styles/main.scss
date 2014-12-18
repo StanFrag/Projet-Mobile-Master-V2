@@ -126,16 +126,16 @@ border-top: 2px solid #A4FF49;
 }
 
 tab-item:active{
-color: #A4FF49;
-opacity: 1;
-border-top: 2px solid #A4FF49;
+  color: #A4FF49;
+  opacity: 1;
+  border-top: 2px solid #A4FF49;
 }
 
 .itemActivated{
-color: #A4FF49 !important;
-opacity: 1 !important;
-border-top: 2px solid #A4FF49 !important;
-margin-top:-2px;
+  color: #A4FF49 !important;
+  opacity: 1 !important;
+  border-top: 2px solid #A4FF49 !important;
+  margin-top:-2px;
 }
 
 /**************************/
@@ -150,3 +150,117 @@ margin-top:-2px;
 	background-color:transparent;
 	z-index:100;
 }
+
+/**************************/
+/******** ALERTES *********/
+/**************************/
+
+.alerts {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  width: 95%;
+  z-index: 10000;
+  color:white;
+  text-align:center
+}
+
+.alerts h4{
+  display: inline-block;
+  color:white;
+  font-weight:bold;
+  margin:0
+}
+
+.alerts button{
+  float: right;
+  font-size:30px;
+  color:white;
+  position: relative;
+  right:0;
+  top:0;
+  line-height: 0.7;
+  background-color:transparent;
+  border: transparent;
+  height:100%;
+  text-align:center
+}
+
+.alert-succes{
+	background-color:#25DD41;
+}
+
+.alert-info{
+	background-color:#5389E2;
+}
+
+.alert-error{
+	background-color:#EF2B2B;
+}
+
+.alerts .alert {
+    position: relative;
+}
+
+.alert {
+    line-height: 1.5;
+}
+
+.alert.animation.ng-enter {
+  -webkit-animation: enter_sequence 0.2s ease-in; /* Safari/Chrome */
+  animation: enter_sequence 0.2s ease-in; /* IE10+ and Future Browsers */
+}
+
+@-webkit-keyframes enter_sequence {
+  from { opacity:0; }
+  to { opacity:1; }
+}
+
+@keyframes enter_sequence {
+  from { opacity:0; }
+  to { opacity:1; }
+}
+
+.alert.animation.ng-leave {
+  -webkit-animation: exit_sequence 0.2s ease-in-out; /* Safari/Chrome */
+  animation: exit_sequence 0.2s ease-in-out; /* IE10+ and Future Browsers */
+}
+
+@-webkit-keyframes exit_sequence {
+  from { opacity:1; }
+  to { opacity:0; right: -100px; }
+}
+
+@keyframes exit_sequence {
+  from { opacity:1; }
+  to { opacity:0; right: -100px; }
+}
+
+/**************************/
+/********** AMIS **********/
+/**************************/
+
+#loginContener .list-inset{
+  margin:0;
+}
+
+#loginContener .item{
+  background-color: inherit;
+  color:white;
+}
+
+#loginContener .item-divider{
+  background-color: #485782;
+  text-align:center;
+  color:white;
+  font-weight:bold;
+}
+
+.imgFriend{
+  width:40px;
+  height:40px;
+  display:inline-block; 
+  vertical-align:middle;
+  margin-right: 20px;
+}
+

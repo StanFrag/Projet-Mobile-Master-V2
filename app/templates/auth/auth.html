@@ -1,1 +1,23 @@
-<ion-nav-view animation="slide-left-right"></ion-nav-view>
+<ion-nav-view animation="slide-left-right">
+</ion-nav-view>
+
+<div class="alerts">
+	<div ng-repeat="alert in alerts" class="alert animation alert-{{alert.type}}">
+		<div class="row">
+	    	
+	    	<div class="col col-90">
+	    		<h4>
+	    			{{ alert.title}}
+	    		</h4>
+	        	{{ alert.msg }}
+	        </div>
+
+	    	<div class="col col-10">
+	    		<button type="button" class="close" ng-click="alert.close()" aria-hidden="true">
+	    			×
+	    		</button>
+	    	</div>
+		
+        <!---->
+	</div>
+</div>

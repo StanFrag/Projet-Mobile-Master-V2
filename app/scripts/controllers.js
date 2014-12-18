@@ -19,15 +19,22 @@ app.controller('CoreCtrl', function($scope, $http, User) {
 	var tok = localStorage.getItem('token');
 	console.log("Recuperation en LocalStorage du token: ",tok);
 
-	if(tok != undefined && tok != null){
-		var tempUser = User.isLoggedIn.isLoggedIn({access_token : tok});
+	if(!tok){
+		AlertService.add('error', 'Attention !', 'Veuillez vous identifier avant d\'acceder au jeu');
+		$scope.goToState('auth.login');
+  	}else{
+  		var tempUser = User.isLoggedIn.isLoggedIn({access_token : tok});
 	  	tempUser.$promise.then(function(result) {
-	  		if(!result.isLoggedIn){
+	  		if(result){
+	  			if(!result.isLoggedIn){
+	  				AlertService.add('error', 'Attention !', 'Veuillez vous identifier avant d\'acceder au jeu');
+		  			$scope.goToState('auth.login');
+		  		}
+	  		}else{
+	  			AlertService.add('error', 'Attention !', 'Problème au sein du serveur Gunther, veuillez contacter un administrateur!');
 	  			$scope.goToState('auth.login');
 	  		}	
 	  	});
-  	}else{
-  		$scope.goToState('auth.login');
   	}
 })
 
@@ -162,6 +169,7 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPla
 		if($scope.map.markers[0] != undefined){
 			var pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
 			$scope.movePlayer(pos);
+			$scope.sendPlayerPosition();
 		}
 	}, function(error){
 		alert('code: '    + error.code    + '\n' + 'message: ' + error.message + '\n');
@@ -231,11 +239,19 @@ app.controller('ChatCtrl', function ($scope) {
 		// On reinitialise le scope des messages
 		$scope.messages = [];
 	}
-
 })
 
 app.controller('EventsCtrl', function ($scope) {})
-app.controller('FriendsCtrl', function ($scope) {})
+
+app.controller('FriendsCtrl', function ($scope) {
+
+	$scope.internFriend = [
+							{id:0, nom:"Lucas Soler", srcImg:"img/dolo.jpg"},
+							{id:1, nom:"Stan Frag", srcImg:"img/dolo.jpg"},
+							{id:2, nom:"Robin Zattara", srcImg:"img/dolo.jpg"}
+	]
+})
+
 app.controller('PartyCtrl', function ($scope) {})
 app.controller('ParamsCtrl',  function ($scope) {})
 app.controller('RankCtrl', function ($scope) {})
@@ -247,58 +263,109 @@ app.controller('RulesCtrl', function ($scope) {})
 
 app.controller('AuthCtrl', function($scope, $state, $rootScope, User) {
 
-	var tok = localStorage.getItem('token');
+	var tok = localStorage.getItem('token');	
 
 	console.log("Recuperation en LocalStorage du token: ",tok);
 
-	if(tok != undefined && tok != null){
+	if(tok)
+	{
 		var tempUser = User.isLoggedIn.isLoggedIn({access_token : tok});
 		tempUser.$promise.then(function(result) {
 	  		if(result.isLoggedIn){
+	  			AlertService.add('succes', 'Félicitation !', 'Vous avez été redirigé vers le jeu car vous ètes deja connecté');
 	  			$scope.goToState('core.map');
 	  		}
 	  	});
 	}
 })
 
-app.controller('AuthLoginCtrl', function($scope, $state, $rootScope, User) {
+app.controller('AuthLoginCtrl', function($scope, $state, $rootScope, User, AlertService) {
 
 	$scope.user = {};
-
 	$scope.messagesInfo = $rootScope.messagesInfo;	
 
 	$scope.authenticate = function(params){
-		console.log("login envoyé")
-		if(params.login == undefined){
-
-			$rootScope.messagesInfo.push({title: "Attention !", content: "Veuillez saisir un Login valide!", status: "alert-error"});
-
-		}else if(params.password == undefined){
-
-			$rootScope.messagesInfo.push({title: "Attention !", content: "Veuillez saisir un Mot de passe valide!", status: "alert-error"});
-
-		}else{
+		if(!params){
+			AlertService.add('error', 'Attention !', 'Aucune informations recuperer, veuillez remplir l\'ensemble des champs pour pouvoir vous identifier !');
+		}else if(params.login && params.password){
 
 			var promise = User.login.loginUser({email: params.login, password: params.password});
-
 			promise.$promise.then(function(result){
 				console.log(result);
 				if(result.error) {
-					$rootScope.messagesInfo.push({title: "Error !", content: result.error, status: "alert-error"});
+					AlertService.add('error', 'Attention !', result.error);
 				} else if(result.user) {
-					console.log();
-					$rootScope.messagesInfo.push({title: "Succès !", content: result.user, status: "alert-succes"});
+					AlertService.add('succes', 'Félicitation !', result.user);
 					localStorage.setItem("token", result.user.token);
-					console.log("Insert en LocalStorage du token: ",result.user.token);
+					console.log("Insert en LocalStorage du token: ", result.user.token);
 					$state.go('core.map');
 				}
 			}, 
 			function(error){
-				console.log(error);
-				$rootScope.messagesInfo.push({title: "Error !", content: error, status: "alert-error"});
+				AlertService.add('error', 'Attention !', error);
 			})
 
+		}else{
+			AlertService.add('error', 'Attention !', 'Veuillez remplir l\'ensemble des champs du formulaire!');
 		}
 
+	}
+})
+
+app.controller('AuthRegisterCtrl', function($scope, $state, $rootScope, User, AlertService) {
+
+	$scope.user = {};
+	$scope.messagesInfo = $rootScope.messagesInfo;	
+	console.log("toto");
+	$scope.register = function(params){
+		if(!params){
+			AlertService.add('error', 'Attention !', 'Aucune informations recuperer, veuillez remplir l\'ensemble des champs pour pouvoir vous inscrire !');
+		}else if(params.password && params.passwordVerif && params.email && params.login){
+			if(params.password != params.passwordVerif){
+				AlertService.add('error', 'Attention !', 'Le mot de passe et la verification ne sont pas identiques !');
+			}else{
+				var promise = User.register.create({username : params.login, email : params.email, password : params.password});
+				promise.$promise.then(function(result) {
+					console.log(result);
+					if(result.error) {
+						AlertService.add('error', 'Attention !', result.error);
+					} else if(result.user) {
+						AlertService.add('succes', 'Félicitation !', result.user);
+						$state.go('auth.login');
+					}
+				},
+				function(error) {
+					AlertService.add('error', 'Attention !', error);
+				});
+			}
+		}else{
+			AlertService.add('error', 'Attention !', 'Veuillez remplir l\'ensemble des champs du formulaire!');
+		}
+	}
+})
+
+app.controller('AuthForgotCtrl', function($scope, $state, $rootScope, User, AlertService) {	
+	$scope.user = {};
+
+	$scope.forgot = function(email){
+		console.log(email);
+		if(email){
+			var promise = User.forgot.resetPassword({email : email});
+			promise.$promise.then(function(result) {
+				console.log(result);
+				if(result.error) {
+					AlertService.add('error', 'Attention !', result.error);
+				} else if(result.user) {
+					AlertService.add('succes', 'Félicitation !', result.user);
+					$state.go('auth.login');
+				}
+			},
+			function(error) {
+				AlertService.add('error', 'Attention !', error);
+				$rootScope.messagesInfo.push({title: "Error !", content: error, status: "alert-error"});
+			});
+		}else{
+			AlertService.add('error', 'Attention !', 'Veuillez saisir un email valide !');
+		}
 	}
 })

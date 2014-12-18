@@ -29,6 +29,6 @@
   },
   {
     "text": "Deconnexion",
-    "link": "login"
+    "link": "auth.login"
   }], "count":8
 }

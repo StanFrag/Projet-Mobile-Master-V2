@@ -1,0 +1,28 @@
+<ion-view title="Amis" id="loginContener">
+  <ion-content class="has-header" scroll="false">
+
+    <div class="list list-inset dark">
+      <label class="item item-input">
+        <i class="icon ion-search placeholder-icon"></i>
+        <input type="text" placeholder="Rechercher..." min-length="1" model="users" source="getUsersByName(str)">
+      </label>
+    </div>
+
+    <div class="list">
+        <a class="item" href="#" ng-repeat="friend in internFriend | filter:search.value">
+          <img class="imgFriend" src="{{friend.srcImg}}">
+          {{friend.nom}}
+        </a>
+    </div>
+
+  </ion-content>
+</ion-view>
+
+<div class="tabs-striped tabs-background-dark tabs-color-assertive">
+  <div class="tabs" >
+    <a class="tab-item" ng-click="">
+      <i class="icon ion-plus"></i>
+      Ajout
+    </a>
+  </div>
+</div>

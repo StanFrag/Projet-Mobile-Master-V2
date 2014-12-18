@@ -17,7 +17,7 @@
     "titre":"Favorites", 
     "icone":"ion-star", 
     "classe":"tab-item", 
-    "clickAction":"activeItem(2)", 
+    "clickAction":"activeItem(2)",
     "id":2
   },
   {

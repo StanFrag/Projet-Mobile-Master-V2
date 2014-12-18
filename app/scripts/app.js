@@ -97,11 +97,13 @@ angular.module('Guntherandthehunters', ['ionic', 'config', 'Guntherandthehunters
 
     .state('auth.register', {
       url: "/register",
+      controller : 'AuthRegisterCtrl',
       templateUrl: 'templates/auth/register.html'
     })
 
     .state('auth.forgot', {
       url: "/forgot",
+      controller : 'AuthForgotCtrl',
       templateUrl: 'templates/auth/forgot.html'
     })
 

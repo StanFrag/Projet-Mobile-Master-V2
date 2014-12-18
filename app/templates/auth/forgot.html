@@ -11,20 +11,20 @@
         <br>
         <br>
 
-        <span class="input-label loginLabel">Email :</span>
-        <label class="item item-input">
-          <input  type="email" placeholder="Entrez votre Email..." ng-model="user.login">
-        </label>
-
-        <br>
-        <br>
-
-        <button class="button button-full button-dark" ng-click="goToState('auth.login')">
-          Récuperer
-        </button>
-        <button class="button button-full button-dark" ng-click="goToState('auth.login')">
-          Annuler
-        </button>
+        <form ng-submit="forgot(user.email)">
+          <span class="input-label loginLabel">Email :</span>
+          <label class="item item-input">
+            <input  type="email" placeholder="Entrez votre Email..." ng-model="user.email">
+          </label>
+          <br>
+          <br>
+          <button type="submit" class="button button-full button-dark">
+            Réinitialiser
+          </button>
+          <button class="button button-full button-dark" ng-click="goToState('auth.login')">
+            Annuler
+          </button>
+        </form>
 
       </div>
       <div class="col col-5"></div>  
