@@ -257,10 +257,66 @@ tab-item:active{
 }
 
 .imgFriend{
-  width:40px;
-  height:40px;
+  width:150%;
+  height:150%;
   display:inline-block; 
   vertical-align:middle;
-  margin-right: 20px;
+  margin:0 auto;
 }
+
+.friendElement{
+  border:0;
+  border-bottom: 1px solid white;
+  margin:0px;
+  padding:10px;
+  background-color:#314161  !important;
+}
+
+.iconFriendItem{
+  float: right;
+  min-width:0px;
+  min-height:0px;
+  width:30px;
+  margin-right:2%;
+  margin-left:2%;
+}
+
+.iconFriendItemIcon:before{
+  float:right !important;
+  margin:0 8% !important;
+  padding: 0 !important;
+  font-size: 5vw;
+}
+
+.friendName{
+  color: white !important;
+  font-size: 3vw !important;
+  font-weight: bold;
+  overflow:visible !important;
+}
+
+.notConnected{
+  color:grey !important;
+  background-color: #3E4551 !important;
+  p{
+    color:grey !important;
+  }
+  img{
+    filter: grayscale(1);
+  -webkit-filter: grayscale(1);
+  -moz-filter: grayscale(1);
+  -o-filter: grayscale(1);
+  -ms-filter: grayscale(1);
+  }
+}
+
+.pane, .view{
+  background-color: inherit;
+  height: 100%;
+}
+
+.searchInput{
+  background-color: white;
+}
+
 

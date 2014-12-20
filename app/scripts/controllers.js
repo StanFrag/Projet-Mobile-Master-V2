@@ -39,7 +39,7 @@ app.controller('CoreCtrl', function($scope, $http, User) {
 })
 
 // Controller general à l'ensemble de l'application
-.controller('ConfigCtrl', function($scope, $state, $rootScope, $http) {
+app.controller('ConfigCtrl', function($scope, $state, $rootScope, $http) {
 
 	// Fonction goToState avec pour parametre l'url d'un state
 	$scope.goToState = function(url){
@@ -246,9 +246,83 @@ app.controller('EventsCtrl', function ($scope) {})
 app.controller('FriendsCtrl', function ($scope) {
 
 	$scope.internFriend = [
-							{id:0, nom:"Lucas Soler", srcImg:"img/dolo.jpg"},
-							{id:1, nom:"Stan Frag", srcImg:"img/dolo.jpg"},
-							{id:2, nom:"Robin Zattara", srcImg:"img/dolo.jpg"}
+							{
+								id:0, 
+								nom:"Lucas Soler", 
+								srcImg:"../images/img_profil/robin_img.jpg", 
+								isLogged:true, 
+								icon: {
+									play: true,
+									chat: true, 
+									location: true
+								}
+							},
+							{
+								id:1, 
+								nom:"Stan Frag", 
+								srcImg:"img/dolo.jpg", 
+								isLogged:true,
+								icon: {
+									play: false,
+									chat: false, 
+									location: false
+								}
+							},
+							{
+								id:2, 
+								nom:"Robin Zattara", 
+								srcImg:"img/dolo.jpg",
+								isLogged:false,
+								icon: {
+									play: true,
+									chat: true, 
+									location: false
+								}
+							},
+							{
+								id:3, 
+								nom:"Turin Anis", 
+								srcImg:"img/dolo.jpg",
+								isLogged:false,
+								icon: {
+									play: true,
+									chat: true, 
+									location: true
+								}
+							},
+							{
+								id:4, 
+								nom:"Sami Bendoumou", 
+								srcImg:"img/dolo.jpg",
+								isLogged:true,
+								icon: {
+									play: true,
+									chat: true, 
+									location: false
+								}
+							},
+							{
+								id:5, 
+								nom:"Vanessa Etchegoyen", 
+								srcImg:"img/dolo.jpg",
+								isLogged:false,
+								icon: {
+									play: false,
+									chat: true, 
+									location: false
+								}
+							},
+							{
+								id:6, 
+								nom:"Vincent Tomilas", 
+								srcImg:"img/dolo.jpg",
+								isLogged:false,
+								icon: {
+									play: true,
+									chat: true, 
+									location: true
+								}
+							}
 	]
 })
 

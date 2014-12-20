@@ -1,28 +1,49 @@
 <ion-view title="Amis" id="loginContener">
   <ion-content class="has-header" scroll="false">
 
-    <div class="list list-inset dark">
-      <label class="item item-input">
-        <i class="icon ion-search placeholder-icon"></i>
-        <input type="text" placeholder="Rechercher..." min-length="1" model="users" source="getUsersByName(str)">
-      </label>
-    </div>
+    <ion-tabs class="tabs-dark tabs-icon-only friendTab">
 
-    <div class="list">
-        <a class="item" href="#" ng-repeat="friend in internFriend | filter:search.value">
-          <img class="imgFriend" src="{{friend.srcImg}}">
-          {{friend.nom}}
-        </a>
-    </div>
+      <ion-tab title="Liste" icon="ion-plus" href="#/friends">
+      
+        <ion-view view-title="Liste">
+          <ion-content scroll="true">
+
+            <div class="input-list-inset searchInput">
+              <label class="item item-input">
+                <i class="icon ion-search placeholder-icon"></i>
+                <input type="text" placeholder="Rechercher..." model="internFriend" ng-model="searchText.nom">
+              </label>
+            </div>
+
+            <div class="list">
+                <a class="item item-avatar friendElement" ng-class="{true:'', false:'notConnected'}[friend.isLogged]" ng-repeat="friend in internFriend | filter:searchText | orderBy:'nom':false">
+                  <div class="row row-center">
+                    <div class="col col-10"><img src="http://lorempixel.com/500/500/animals" class="imgFriend"></div>
+                    <div class="col col-60" style="text-align:center">
+                      <p class="friendName">{{friend.nom}}</p>
+                    </div>
+                    <div class="col col-30">
+                        <i class="icon ion-game-controller-b iconFriendItemIcon" ng-show="friend.icon.play"></i>
+                        <i class="icon ion-chatboxes iconFriendItemIcon" ng-show="friend.icon.chat"></i>
+                        <i class="icon ion-location iconFriendItemIcon" ng-show="friend.icon.location"></i>
+                    </div>
+                  </div>
+                </a>
+            </div>
+          </ion-content>
+        </ion-view>
+      
+      </ion-tab>
+
+      <ion-tab title="Ajout" icon="ion-navicon-round" href="#/friends/add">
+        <ion-view view-title="Liste">
+          <ion-content scroll="true">
+            toto est beau
+          </ion-content>
+        </ion-view>
+      </ion-tab>
+
+    </ion-tabs>
 
   </ion-content>
 </ion-view>
-
-<div class="tabs-striped tabs-background-dark tabs-color-assertive">
-  <div class="tabs" >
-    <a class="tab-item" ng-click="">
-      <i class="icon ion-plus"></i>
-      Ajout
-    </a>
-  </div>
-</div>
