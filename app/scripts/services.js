@@ -1,5 +1,5 @@
 'use strict';
-angular.module('Guntherandthehunters.services', ['ngResource'])
+angular.module('Guntherandthehunters.services', [])
 
 .factory('User', function($resource, ENV) {
   return {

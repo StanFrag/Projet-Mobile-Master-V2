@@ -52,7 +52,11 @@ app.controller('ConfigCtrl', function($scope, $state, $rootScope, $http) {
 /******* GENERAL ********/
 /***********************/
 
-app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPlatform,$timeout, $http) {
+app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPlatform,$timeout, $http, SOCKET_URL) {
+
+	console.log("TEST")
+	var socket = io.connect(SOCKET_URL, {'force new connection': true, path: '/socket.io'});
+
 
 	// Tableau des markers present sur la map
 	$scope.player = [];
@@ -65,6 +69,8 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPla
 	// Tableau des boutons du footer
 	$scope.itemsFooter = [];
 
+	$scope.posPlayers = [];
+
 	/*******   MAP  *******/
 
 	// Creation d'une animation de marker
@@ -76,6 +82,153 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPla
 		}
     }
 
+    // Une fois que la map a bien été initialisé
+	$scope.$on('mapInitialized', function(event, map) {
+
+		//Récuperation du style de map en json
+		$http.get('../json/mapStyle.json').success(function(data){
+
+			// Création du style de la map
+	    	var roadGuntherStyles = data;
+	    	var styledMapOptions = {name: 'FR Gunther style'};
+			var frMapGuntherStyle = new google.maps.StyledMapType(roadGuntherStyles, styledMapOptions);
+
+			// Ajout du style de la map
+			map.mapTypes.set('frguntherstyle', frMapGuntherStyle);
+			map.setMapTypeId('frguntherstyle');
+
+			// Ajout de la map
+			$scope.map = map;
+
+			// On initialise la position et le marker du player utilisant l'application
+			$scope.initiatePlayer()
+	    });
+	});
+
+	// Incoming
+	socket.on('posCreated', function(data) {
+		console.log("Données envoyé par le socket du serveur: ", data);
+		$scope.posPlayers.push(data);
+		console.log($scope.posPlayers);
+	});
+
+	$scope.$watch('posPlayers', function(newValue, oldValue) {
+		console.log($scope.player)
+		console.log($scope.posPlayers);
+  		for (var i = $scope.posPlayers.length - 1; i >= 0; i--) {
+  			$scope.posPlayers[i]
+  			$scope.ennemy.push($scope.createMarker(pos));
+  		};
+	});
+
+	$scope.createMarker = function(){
+		var toto = 
+		{
+			posX: pos.x,
+			posY: pos.y,
+			icone:
+				{
+					path:"CIRCLE", 
+		            fillColor: "#F52121",
+		            fillOpacity:1, 
+		            scale: 5, 
+		            strokeColor:"#1D1D1D",
+		            strokeOpacity:1,
+		            strokeWeight:1
+		        },
+		    anim:"DROP",
+		    click: ""
+		}
+
+		return toto;
+	}
+
+	// Outgoing
+	$scope.createPosPlayer = function(position) {
+		console.log("creation dune pos");
+
+		var posPlayer = {
+			pos: {lat:position.k, lng:position.D},
+			user: {}
+		};
+
+		console.log("Emit vers sendPosPlayer de l'objet: ", posPlayer)
+
+		socket.emit('sendPosPlayer', posPlayer);
+	}
+
+	$scope.addMainPlayer = function(coox, cooy){
+		$scope.player = [{
+			posX : coox,
+			posY : cooy,
+			icone :
+	            {
+		            path:'CIRCLE', 
+		            fillColor: '#95DE42', 
+		            scale: 10, 
+		            fillOpacity:1, 
+		            strokeColor:'#1D1D1D',
+		            strokeOpacity:0.5,
+		            strokeWeight:3
+	            },
+	        anim:'DROP',
+	        click: ''
+	    }];
+	}
+
+	// Centrer la map et le joueur sur la position géolocalisé
+	$scope.initiatePlayer= function(){
+
+		// On affiche la barre de chargement
+		$ionicLoading.show({
+			template: 'Loading...'
+		});
+
+		// Une fois que la plateforme ionic est prete
+		$ionicPlatform.ready(function() {
+			// On recherche la position actuel de l'utilisateur
+			navigator.geolocation.getCurrentPosition(function(position) {
+				// On crée une nouvelle position google map
+				var pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+
+				// On rerajoute le joueur a sa nouvelle position
+				$scope.addMainPlayer(position.coords.latitude,position.coords.longitude);
+
+				// On centre la map sur la position du player principal
+				$scope.map.setCenter(pos);
+
+				// On push ces positions dans le tableau de position
+				$scope.positionsPlayer.push({lat: pos.k,lng: pos.B});
+
+				// On cache la barre de chargement
+				$ionicLoading.hide();
+
+			}, function(error){
+				// Si les données de géolocalisation sont inexistante ou desactivé, on previens l'utilisateur
+				alert('code: ' + error.code + '\n' + 'message: ' + error.message + '\n');
+				// On cache la barre de chargement
+				$ionicLoading.hide();
+			});
+		});
+	}
+
+	navigator.geolocation.watchPosition(
+		function(position) {
+			console.log("le nav a vu que ta bougé");
+
+				var pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+				$scope.createPosPlayer(pos);
+
+		}, function(error){
+			alert('code: '    + error.code    + '\n' + 'message: ' + error.message + '\n');
+		}, { 
+			maximumAge: 5000,
+			timeout: 10000, 
+			enableHighAccuracy: true 
+		}
+	);
+
+    /*
     // Une fois que la map a bien été initialisé
 	$scope.$on('mapInitialized', function(event, map) {
 		//Récuperation du style de map en json
@@ -191,14 +344,16 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPla
 
 	/*******   Modal  *******/
 
+	/*
 	// Recuperation du template du modal
-	$ionicModal.fromTemplateUrl('templates/chat/chat.html', function($ionicModal) {
+	$ionicModal.fromTemplateUrl('view/chat/tchat.html', function($ionicModal) {
 		// On injecte le modal dans la scope
 		$scope.modal = $ionicModal;
 	},{
 		scope: $scope,
 		animation: 'slide-in-up'
 	});
+	*/
 
 	/*******   Footer de la Map  *******/
 
