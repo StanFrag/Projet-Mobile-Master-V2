@@ -6,7 +6,7 @@ var app = angular.module('Guntherandthehunters.controllers', ['ngMap'])
 /************************/
 
 //Coeur de l'application
-app.controller('CoreCtrl', function($scope, $http, User) {
+app.controller('CoreCtrl', function($scope, $http, User, AlertService) {
 
 	// On initialise le scope des boutons du menu
 	$scope.list = [];
@@ -16,26 +16,37 @@ app.controller('CoreCtrl', function($scope, $http, User) {
     	$scope.list = data.boutons;
     });
 
-	var tok = localStorage.getItem('token');
-	console.log("Recuperation en LocalStorage du token: ",tok);
+    /*$scope.getStorageToken = function(){
+    	var deferred = Q.defer();
 
-	if(!tok){
-		AlertService.add('error', 'Attention !', 'Veuillez vous identifier avant d\'acceder au jeu');
-		$scope.goToState('auth.login');
-  	}else{
-  		var tempUser = User.isLoggedIn.isLoggedIn({access_token : tok});
-	  	tempUser.$promise.then(function(result) {
-	  		if(result){
-	  			if(!result.isLoggedIn){
-	  				AlertService.add('error', 'Attention !', 'Veuillez vous identifier avant d\'acceder au jeu');
+    	var tok = localStorage.getItem('token');
+
+		console.log("Recuperation en LocalStorage du token: ",tok);
+
+		return deferred.promise;
+    }
+
+    //var toto = getStorageToken();
+
+    if(tok = 'undefined'){
+			console.log("pas de tok");
+			AlertService.add('error', 'Attention !', 'Veuillez vous identifier avant d\'acceder au jeu');
+			$scope.goToState('auth.login');
+	  	}else{
+	  		console.log("Il y a un token dans le local storage");
+	  		var tempUser = User.isLoggedIn.isLoggedIn({access_token : tok});
+		  	tempUser.$promise.then(function(result) {
+		  		if(result){
+		  			if(!result.isLoggedIn){
+		  				AlertService.add('error', 'Attention !', 'Veuillez vous identifier avant d\'acceder au jeu');
+			  			$scope.goToState('auth.login');
+			  		}
+		  		}else{
+		  			AlertService.add('error', 'Attention !', 'Problème au sein du serveur Gunther, veuillez contacter un administrateur!');
 		  			$scope.goToState('auth.login');
-		  		}
-	  		}else{
-	  			AlertService.add('error', 'Attention !', 'Problème au sein du serveur Gunther, veuillez contacter un administrateur!');
-	  			$scope.goToState('auth.login');
-	  		}	
-	  	});
-  	}
+		  		}	
+		  	});
+	  	}*/
 })
 
 // Controller general à l'ensemble de l'application
@@ -53,10 +64,10 @@ app.controller('ConfigCtrl', function($scope, $state, $rootScope, $http) {
 /***********************/
 
 app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPlatform,$timeout, $http, SOCKET_URL) {
-
-	console.log("TEST")
+	
 	var socket = io.connect(SOCKET_URL, {'force new connection': true, path: '/socket.io'});
 
+	var randomId = Math.floor(Math.random() * 500);
 
 	// Tableau des markers present sur la map
 	$scope.player = [];
@@ -105,80 +116,8 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPla
 	    });
 	});
 
-	// Incoming
-	socket.on('posCreated', function(data) {
-		console.log("Données envoyé par le socket du serveur: ", data);
-		$scope.posPlayers.push(data);
-		console.log($scope.posPlayers);
-	});
-
-	$scope.$watch('posPlayers', function(newValue, oldValue) {
-		console.log($scope.player)
-		console.log($scope.posPlayers);
-  		for (var i = $scope.posPlayers.length - 1; i >= 0; i--) {
-  			$scope.posPlayers[i]
-  			$scope.ennemy.push($scope.createMarker(pos));
-  		};
-	});
-
-	$scope.createMarker = function(){
-		var toto = 
-		{
-			posX: pos.x,
-			posY: pos.y,
-			icone:
-				{
-					path:"CIRCLE", 
-		            fillColor: "#F52121",
-		            fillOpacity:1, 
-		            scale: 5, 
-		            strokeColor:"#1D1D1D",
-		            strokeOpacity:1,
-		            strokeWeight:1
-		        },
-		    anim:"DROP",
-		    click: ""
-		}
-
-		return toto;
-	}
-
-	// Outgoing
-	$scope.createPosPlayer = function(position) {
-		console.log("creation dune pos");
-
-		var posPlayer = {
-			pos: {lat:position.k, lng:position.D},
-			user: {}
-		};
-
-		console.log("Emit vers sendPosPlayer de l'objet: ", posPlayer)
-
-		socket.emit('sendPosPlayer', posPlayer);
-	}
-
-	$scope.addMainPlayer = function(coox, cooy){
-		$scope.player = [{
-			posX : coox,
-			posY : cooy,
-			icone :
-	            {
-		            path:'CIRCLE', 
-		            fillColor: '#95DE42', 
-		            scale: 10, 
-		            fillOpacity:1, 
-		            strokeColor:'#1D1D1D',
-		            strokeOpacity:0.5,
-		            strokeWeight:3
-	            },
-	        anim:'DROP',
-	        click: ''
-	    }];
-	}
-
 	// Centrer la map et le joueur sur la position géolocalisé
 	$scope.initiatePlayer= function(){
-
 		// On affiche la barre de chargement
 		$ionicLoading.show({
 			template: 'Loading...'
@@ -190,6 +129,15 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPla
 			navigator.geolocation.getCurrentPosition(function(position) {
 				// On crée une nouvelle position google map
 				var pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+
+				var posPlayer = {
+					user:randomId,
+					posX:position.coords.latitude,
+					posY:position.coords.longitude
+				};
+
+				console.log("Envoi d'un nouveau player: ", posPlayer);
+				socket.emit('newUser', posPlayer);
 
 				// On rerajoute le joueur a sa nouvelle position
 				$scope.addMainPlayer(position.coords.latitude,position.coords.longitude);
@@ -212,15 +160,154 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPla
 		});
 	}
 
+	// Incoming
+	socket.on('broadcastPositions', function(datas) {
+
+		console.log("Données envoyé par le socket du serveur: ", datas);
+
+		var tmpData = [];
+
+		for (var i = datas.length - 1; i >= 0; i--) {
+
+			var obj = {
+				"posX":datas[i].posX,
+				"posY":datas[i].posY,
+				"id":datas[i].user,
+				"icone":
+				{
+					"path":"CIRCLE", 
+		            "fillColor": "#F52121",
+		            "fillOpacity":1, 
+		            "scale": 5, 
+		            "strokeColor":"#1D1D1D",
+		            "strokeOpacity":1,
+		            "strokeWeight":1
+		        },
+		    	"anim":"DROP",
+		    	"click": ""
+			};
+
+			tmpData.push(obj);
+		};
+		
+		$scope.ennemy = tmpData;
+	});
+
+	socket.on('userPositionChange', function(data) {
+		console.log("un user a changé de position", data);
+
+		if(data.user == randomId){
+			console.log("J'ai moi meme bougé donc je vais deplacer mon marker");
+			
+
+			var pos = new google.maps.LatLng(data.posX, data.posY);
+			$scope.movePlayer(pos);
+
+			console.log($scope.map.markers);
+			console.log($scope.ennemy);
+
+			for (var i = 0; i < $scope.ennemy.length; i++) {
+
+				var tmp = $scope.ennemy[i];
+				console.log(tmp);
+				if(data.user == tmp){
+					console.log("hihi");
+				}
+			}
+
+		}else{
+			console.log("Un joueur adverse à effectué un mouvement");
+
+			for (var i = 0; i < $scope.ennemy.length + 1; i++) {
+				console.log("je passe::", $scope.ennemy[i]);
+
+				if(data.user == $scope.map.markers[i].id){
+					console.log("hihi");
+				}
+			}
+		}
+	});
+
+	socket.on('posCreated', function(data) {
+		console.log("Données envoyé par le socket du serveur: ", data);
+		$scope.posPlayers.push(data);
+		console.log($scope.posPlayers);
+	});
+
+	$scope.$watch('posPlayers', function(newValue, oldValue) {
+		console.log($scope.player)
+		console.log($scope.posPlayers);
+  		for (var i = $scope.posPlayers.length - 1; i >= 0; i--) {
+  			$scope.posPlayers[i]
+  			$scope.ennemy.push($scope.createMarker(pos));
+  		};
+	});
+
+	// Outgoing
+	$scope.createPosPlayer = function(position) {
+
+		var posPlayer = {
+			user:randomId,
+			posX:position.k,
+			posY:position.D
+		};
+
+		console.log("Envoi vers le serveur de l'objet: ", posPlayer)
+
+		socket.emit('watchPosition', posPlayer);
+	}
+
+	$scope.addMainPlayer = function(coox, cooy){
+		$scope.player = [{
+			posX : coox,
+			posY : cooy,
+			icone :
+	            {
+		            path:'CIRCLE', 
+		            fillColor: '#95DE42', 
+		            scale: 10, 
+		            fillOpacity:1, 
+		            strokeColor:'#1D1D1D',
+		            strokeOpacity:0.5,
+		            strokeWeight:3
+	            },
+	        anim:'DROP',
+	        click: ''
+	    }];
+	}
+
+	$scope.movePlayer = function(pos){
+
+		var tmpObj = $scope.map.markers[0];
+
+		// On affiche la barre de chargement
+		$ionicLoading.show({
+			template: 'Loading...'
+		});
+
+		$scope.positionsPlayer.push({lat: pos.k,lng: pos.B});
+
+        tmpObj.animateTo(
+        	pos, 
+			{
+				easing: 'linear', 
+				duration: 3000,
+				complete: function(){
+					$scope.map.setCenter(pos);
+					$ionicLoading.hide();
+				}
+            });
+	}
+
 	navigator.geolocation.watchPosition(
 		function(position) {
-			console.log("le nav a vu que ta bougé");
-
-				var pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-				$scope.createPosPlayer(pos);
+			console.log("Mouvement du joueur intercepté")
+			var pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+			$scope.createPosPlayer(pos);
 
 		}, function(error){
-			alert('code: '    + error.code    + '\n' + 'message: ' + error.message + '\n');
+			//alert('code: '    + error.code    + '\n' + 'message: ' + error.message + '\n');
+			console.log("erreur dans la geoloc")
 		}, { 
 			maximumAge: 5000,
 			timeout: 10000, 
@@ -281,7 +368,6 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPla
 		var pos = new google.maps.LatLng($scope.positionsPlayer[tmpPos].lat, $scope.positionsPlayer[tmpPos].lng);
 		//$scope.activeItem[0];
 		$scope.map.setCenter(pos);
-		
 	}
 
 	// Centrer la map et le joueur sur la position géolocalisé

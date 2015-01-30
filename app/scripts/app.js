@@ -112,6 +112,5 @@ angular.module('Guntherandthehunters', ['ngResource', 'ionic', 'config', 'Gunthe
 })
 
 .value('USER',{})
-.value('SOCKET_URL','192.168.110.120:3000')
-.value('ENV','192.168.110.120:3000');
+.value('SOCKET_URL','localhost:3000')
 
