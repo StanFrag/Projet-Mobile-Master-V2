@@ -222,9 +222,23 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPla
 app.controller('ChatCtrl', function ($scope) {
 	// On initialise le tableau de messages
 	$scope.messages = [];
+	//Chambres de discussions disponnibles pour l'utilisateur
+	$scope.rooms = [];
+
+	//Récupération des rooms disponnibles pour l'utilisateur
+
+	//L'utilisateur rejoins une Room
+	$scope.joinRoom = function(messages) {
+		//On remplace les message par ceux de la room
+		$scope.messages = messages;
+		//On crée un événement d'écoute des nouveaux messages
+	}
 
 	// Fonction de creation d'un nouveau message
 	$scope.addMessage = function(item){
+		//Evenement d'emission du message vers le serveur
+
+		/* OLD STAN
 		// Recuperation de l'heure et des minutes
 		var d = new Date();
 		var hour = d.getHours();
@@ -232,6 +246,12 @@ app.controller('ChatCtrl', function ($scope) {
 		var timeItem = ""+hour +":"+minute+"";
 		// Ajout du nouveau message dans le tableau des messages
 		$scope.messages.push({content:item, time:timeItem});
+		*/
+	}
+
+	//Ouverture du volet des rooms disponnibles
+	$scope.openList = function(){
+
 	}
 
 	// Fonction de clear du chat
@@ -241,7 +261,39 @@ app.controller('ChatCtrl', function ($scope) {
 	}
 })
 
-app.controller('EventsCtrl', function ($scope) {})
+app.controller('EventsCtrl', function ($scope) {
+	//Initialisation du tableau d'événements
+	$scope.events = [];
+	//Initialisation du tableau de filtres
+	$scope.filters = {
+		limit : 10,
+		offset : 0,
+		filter : ''
+	};
+
+	//Vue d'affichage des filtres d'affichage des events
+	$scope.openFilter = function() {
+
+	}
+	//Fonction de récupération des événements
+	$scope.getEvents = function(limit, offset, filter) {
+
+	}
+	//Récupère plus d'événements au scroll de l'utilisateur
+	$scope.getMoreEvents = function() {
+
+	}
+})
+
+app.controller('EventsDetailsCtrl', function ($scope) {
+	//Récupération de l'événement
+	$scope.event = [];
+
+	//L'utilisateur clique sur le bouton participer/se désinscrire de l'événement
+	$scope.participate = function() {
+
+	}
+})
 
 app.controller('FriendsCtrl', function ($scope) {
 
@@ -327,7 +379,9 @@ app.controller('FriendsCtrl', function ($scope) {
 })
 
 app.controller('PartyCtrl', function ($scope) {})
-app.controller('ParamsCtrl',  function ($scope) {})
+app.controller('ParamsCtrl',  function ($scope) {
+
+})
 app.controller('RankCtrl', function ($scope) {})
 app.controller('RulesCtrl', function ($scope) {})
 
