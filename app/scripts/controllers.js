@@ -54,6 +54,7 @@ app.controller('CoreCtrl', function($scope, $http, $q, User, AlertService, CURRE
 		  	});
 	  	}
   	}
+
 })
 
 // Controller general à l'ensemble de l'application
@@ -70,7 +71,9 @@ app.controller('ConfigCtrl', function($scope, $state, $rootScope, $http) {
 /******* GENERAL ********/
 /***********************/
 
-app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPlatform,$timeout, $http, SOCKET_URL, CURRENTUSER) {
+app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPlatform,$timeout, $http, SOCKET_URL, CURRENTUSER, $ionicSideMenuDelegate) {
+	//On empêche le drag menu sur cette page
+	$ionicSideMenuDelegate.canDragContent(false);
 	
 	var socket = io.connect(SOCKET_URL, {'force new connection': true, path: '/socket.io'});
 
@@ -491,7 +494,7 @@ app.controller('ChatCtrl', function ($scope) {
 	}
 })
 
-app.controller('EventsCtrl', function ($scope, User, Event, $ionicLoading, AlertService) {
+app.controller('EventsCtrl', function ($scope, User, Event, $ionicLoading, AlertService, $http) {
 
 	//Initialisation du tableau d'événements
 	$scope.events = [];
@@ -508,6 +511,24 @@ app.controller('EventsCtrl', function ($scope, User, Event, $ionicLoading, Alert
 
 	}
 
+	$scope.$on('mapInitialized', function(event, map) {
+
+		//Récuperation du style de map en json
+		$http.get('../json/mapStyle.json').success(function(data){
+			// Création du style de la map
+			var roadGuntherStyles = data;
+			var styledMapOptions = {name: 'FR Gunther style'};
+			var frMapGuntherStyle = new google.maps.StyledMapType(roadGuntherStyles, styledMapOptions);
+
+			// Ajout du style de la map
+			map.mapTypes.set('frguntherstyle', frMapGuntherStyle);
+			map.setMapTypeId('frguntherstyle');
+
+			// Ajout de la map
+			$scope.map = map;
+		});
+	});
+
 	//Fonction de récupération des événements
 	$scope.getEvents = function(limit, offset, filter, hisEvents) {
 		if(hisEvents) {
@@ -517,6 +538,7 @@ app.controller('EventsCtrl', function ($scope, User, Event, $ionicLoading, Alert
 		var promiseEvents = Event.user.get({limit : limit, offset : offset, filter : filter, id : id});
 		promiseEvents.$promise.then(function(data) {
 			if(data.success) {
+				console.log(data.events);
 				//On ajoute les événements au tableau éxistant
 				$scope.events= $scope.events.concat(data.events);
 				$ionicLoading.hide();
@@ -566,7 +588,9 @@ app.controller('EventsCtrl', function ($scope, User, Event, $ionicLoading, Alert
 
 })
 
-app.controller('AddEventCtrl', function($scope, $http, Event, User, $stateParams) {
+app.controller('AddEventCtrl', function($scope, $http, Event, User, $stateParams, $ionicSideMenuDelegate) {
+	//On empêche le drag menu sur cette page
+	$ionicSideMenuDelegate.canDragContent(false);
 	$scope.coords = "44.8376455, -0.5790386999999555";
 	/**
 	 * OPTIONS DU FORMULAIRE
@@ -816,16 +840,6 @@ app.controller('AddEventCtrl', function($scope, $http, Event, User, $stateParams
 		}
 	}
 
-
-	$scope.submit = function() {
-		console.log($scope.update);
-		if($scope.update == true) {
-			$scope.updateEvent();
-		} else {
-			$scope.create();
-		}
-	}
-
 	$scope.updateEvent = function() {
 		var user        = User.getUser();
 		var event       = $scope.event;
@@ -902,6 +916,15 @@ app.controller('AddEventCtrl', function($scope, $http, Event, User, $stateParams
 				"Une erreure a empéché la création de l'évenement, merci de réessayer."
 			$rootScope.success = "";
 		});
+	}
+
+
+	$scope.submit = function() {
+		if($scope.update == true) {
+			$scope.updateEvent();
+		} else {
+			$scope.create();
+		}
 	}
 });
 

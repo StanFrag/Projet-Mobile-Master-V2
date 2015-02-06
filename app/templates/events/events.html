@@ -1,5 +1,5 @@
 <ion-view title="evenements">
-  <ion-content class="has-header padding eventList" scroll="false">
+  <ion-content class="has-header eventList" scroll="false">
     <ion-tabs class="tabs-dark tabs-icon-only">
       <ion-tab title="Liste" icon="ion-navicon-round" href="#/events">
 
@@ -13,28 +13,44 @@
             </a>
           </div>
         </div>
-        <div class="tabContent">
-          <ul>
-            <li ng-repeat="e in events" class="event">
-              <div class="infosEvent">
-                <div class="dateEvent">
-                  {{ e.event.created | date:'yyyy-MM-dd'}}
-                </div>
-                <div class="title">
-                  <h2>{{ e.event.title }}</h2>
 
-                </div>
-                <div class="participantsEvent">
-                  {{ e.participants.length }} / {{ e.event.max_players }}
-                </div>
-              </div>
-              <div class="clear"></div>
-              <div>
+          <ion-view view-title="Liste">
+            <ion-content scroll="true" >
+              <div class="tabContent">
+            <ul>
+              <li ng-repeat="e in events" class="event">
+                <div class="infosEvent">
+                  <div class="dateEvent">
+                    {{ e.event.created | date:'yyyy-MM-dd'}}
+                  </div>
+                  <div class="title">
+                    <h2>{{ e.event.title }}</h2>
 
+                  </div>
+                  <div class="participantsEvent">
+                    {{ e.participants.length }} / {{ e.event.max_players }}
+                  </div>
+                </div>
+                <div class="clear"></div>
+                <div class="mapEvent">
+                  <map center="{{ e.coords.posX }}, {{ e.coords.posY }}"
+                       zoom="8"
+                       disable-default-u-i="true"
+                       disable-double-click-zoom="false"
+                       draggable="false"
+                       draggable-cursor="finger"
+                       dragging-cursor="move"
+                       keyboard-shortcuts="false"
+                       max-zoom="20"
+                       min-zoom="2"
+                       tilt="45">
+                  </map>
+                </div>
+              </li>
+            </ul>
               </div>
-            </li>
-          </ul>
-        </div>
+            </ion-content>
+          </ion-view>
       </ion-tab>
       <ion-tab title="Ajout" icon="ion-plus" href="#/events/add">
 

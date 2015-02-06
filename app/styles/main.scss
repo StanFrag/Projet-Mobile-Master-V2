@@ -143,8 +143,12 @@ h1{
     font-size: 1.3em;
     width: 100%;
     border-top: 3px solid $green;
-    padding: 10px 10px 0 10px;
+    .mapEvent {
+      height: 150px;
+    }
+
     .infosEvent {
+      padding: 10px;
       div {
         float: left;
       }
@@ -179,9 +183,34 @@ h1{
     color : white;
     font-weight: bold;
   }
+  input {
+    padding : 10px;
+  }
+  p {
+    margin-bottom: 20px;
+    .datetimepicker {
+      background-color: white;
+    }
+  }
 
+  #dateFin {
+    margin-bottom: 10px;
+  }
   .slider {
     visibility: visible;
+    overflow: visible;
+    display : block;
+    margin-left: 10px;width : 50%;
+    .slider-handle {background-color: $green!important;
+      opacity : 1;
+      background-image: none;
+    }
+  }
+  .button {
+    padding : 0;
+    input {
+      line-height: auto;
+    }
   }
 }
 /**************************/
