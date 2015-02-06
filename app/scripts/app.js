@@ -6,7 +6,7 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-angular.module('Guntherandthehunters', ['ionic', 'config', 'Guntherandthehunters.controllers', 'Guntherandthehunters.services'])
+angular.module('Guntherandthehunters', ['ngResource', 'ionic', 'config', 'Guntherandthehunters.controllers', 'Guntherandthehunters.services'])
 
 .run(function($ionicPlatform, $rootScope) {
   $rootScope.messagesInfo = [];
@@ -109,5 +109,8 @@ angular.module('Guntherandthehunters', ['ionic', 'config', 'Guntherandthehunters
 
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/map');
-});
+})
+
+.value('USER',{})
+.value('SOCKET_URL','localhost:3000')
 
