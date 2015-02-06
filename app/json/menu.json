@@ -29,6 +29,7 @@
   },
   {
     "text": "Deconnexion",
-    "link": "auth.login"
+    "link": "auth.login",
+    "ng-click": "$scope.disconnect()"
   }], "count":8
 }

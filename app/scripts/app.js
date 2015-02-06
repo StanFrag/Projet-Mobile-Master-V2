@@ -111,6 +111,6 @@ angular.module('Guntherandthehunters', ['ngResource', 'ionic', 'config', 'Gunthe
   $urlRouterProvider.otherwise('/map');
 })
 
-.value('USER',{})
+.value('CURRENTUSER',{})
 .value('SOCKET_URL','localhost:3000')
 
