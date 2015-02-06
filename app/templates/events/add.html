@@ -1,0 +1,87 @@
+
+<ion-view title="evenements">
+    <ion-content class="has-header eventList"  scroll="false">
+        <ion-tabs class="tabs-dark tabs-icon-only">
+            <ion-tab title="Liste" icon="ion-navicon-round" href="#/events">
+
+            </ion-tab>
+            <ion-tab title="Ajout" icon="ion-plus" href="#/events/add">
+                <ion-view view-title="Liste">
+                    <ion-content scroll="true">
+                        <form name="myForm" class="my-form eventForm" ng-submit="submit()">
+                            <p class="mapFormEvent">
+                                <map center="44.8376455,-0.5790386999999555"
+                                     zoom="14"
+                                     disable-default-u-i="true"
+                                     disable-double-click-zoom="false"
+                                     draggable="true"
+                                     draggable-cursor="finger"
+                                     dragging-cursor="move"
+                                     keyboard-shortcuts="false"
+                                     max-zoom="20"
+                                     min-zoom="12"
+                                     tilt="45">
+                                    <marker ng-repeat="m in markers"
+                                            position="{{m.posX}},{{m.posY}}"
+                                            icon="{{m.icone}}"
+                                            on-click="{{m.click}}"
+                                            animation="{{m.anim}}"
+                                            draggable="true"
+                                            class="center"
+                                            z-index="1">
+                                    </marker>
+                                </map>
+                            </p>
+                            <p>
+                                <label for="coords" class="coords" data-icon="u">Centre</label>
+                                <input id="coords" name="coords" ng-model="coords" required="required" type="text" placeholder="Ex : 44.2056401, -0.574568"/>
+                            </p>
+                            <p>
+                                <label class="perimeter">Périmètre ({{sliders.sliderValue}} mètres )</label>
+                            <p>
+                                <slider ng-model="sliders.sliderValue" min="perimeterOptions.min" step="perimeterOptions.step" max="perimeterOptions.max" value="perimeterOptions.value"></slider>
+                            </p>
+                            </p>
+                            <p>
+                                <label class="perimeter">Durée ({{sliders.durationValue}} minutes )</label>
+                            <p>
+                                <slider ng-model="sliders.durationValue" min="durationOptions.min" step="durationOptions.step" max="durationOptions.max" value="durationOptions.value"></slider>
+                            </p>
+                            </p>
+                            <p>
+                                <label class="perimeter">Joueurs ({{sliders.playersValue}})</label>
+                            <p>
+                                <slider ng-model="sliders.playersValue" range="true" min="playersOptions.min" step="playersOptions.step" max="playersOptions.max" value="playersOptions.value"></slider>
+                            </p>
+                            </p>
+                            <p>
+                                <label class="perimeter">Difficulté (<span class="difficulty-{{difficulty}}">{{difficulty}}</span>)</label>
+                            <p>
+                                <slider ng-model="sliders.difficultyValue" min="difficultyOptions.min" step="difficultyOptions.step" max="difficultyOptions.max" value="difficultyOptions.value"></slider>
+                            </p>
+                            </p>
+                            <p>
+                                <label class="begin">Date</label>
+                                <input id="dateFin" name="dateFin" ng-model="event.dateFin" required="required" type="text"/>
+                                <datetimepicker data-datetimepicker-config="{ minuteStep: 15 }" data-ng-model="event.created" data-on-set-time="onTimeSet(newDate, oldDate)"></datetimepicker>
+                            </p>
+                            <p>
+                                <label for="title">Titre de l'événement </label>
+                                <input id="title" name="title" ng-model="event.title" required="required" type="text" placeholder="Ex : Super event @ Bordeaux"/>
+                            </p>
+                            <p>
+                                <label for="description">Description </label>
+                                <textarea id="description" name="description" ng-model="event.description" type="text"></textarea>
+                            </p>
+                            <p class="signin button">
+                                <input type="submit" value="Envoyer"/>
+                            </p>
+                        </form>
+                    </ion-content>
+                </ion-view>
+
+            </ion-tab>
+
+        </ion-tabs>
+    </ion-content>
+</ion-view>

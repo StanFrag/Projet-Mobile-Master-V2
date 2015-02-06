@@ -1,10 +1,8 @@
 <ion-view title="evenements">
   <ion-content class="has-header padding eventList" scroll="false">
     <ion-tabs class="tabs-dark tabs-icon-only">
-
-
-
       <ion-tab title="Liste" icon="ion-navicon-round" href="#/events">
+
         <div class="tabs-striped tabs-top tabs-background-positive tabs-color-green">
           <div class="tabs">
             <a class="tab-item active" href="#">
@@ -20,7 +18,7 @@
             <li ng-repeat="e in events" class="event">
               <div class="infosEvent">
                 <div class="dateEvent">
-                  {{ e.event.created }}
+                  {{ e.event.created | date:'yyyy-MM-dd'}}
                 </div>
                 <div class="title">
                   <h2>{{ e.event.title }}</h2>

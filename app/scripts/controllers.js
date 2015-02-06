@@ -512,13 +512,11 @@ app.controller('EventsCtrl', function ($scope, User, Event, $ionicLoading, Alert
 	$scope.getEvents = function(limit, offset, filter, hisEvents) {
 		if(hisEvents) {
 			var id = $scope.user.id;
-			console.log($scope.user);
 		}
 
 		var promiseEvents = Event.user.get({limit : limit, offset : offset, filter : filter, id : id});
 		promiseEvents.$promise.then(function(data) {
 			if(data.success) {
-				console.log(data)
 				//On ajoute les événements au tableau éxistant
 				$scope.events= $scope.events.concat(data.events);
 				$ionicLoading.hide();
@@ -567,6 +565,345 @@ app.controller('EventsCtrl', function ($scope, User, Event, $ionicLoading, Alert
 
 
 })
+
+app.controller('AddEventCtrl', function($scope, $http, Event, User, $stateParams) {
+	$scope.coords = "44.8376455, -0.5790386999999555";
+	/**
+	 * OPTIONS DU FORMULAIRE
+	 */
+	var options = Event.getOptions();
+	$scope.maxPerimeter = options.maxPerimeter;
+	$scope.minPerimeter = options.minPerimeter;
+	$scope.minDuration = options.minDuration;
+	$scope.maxDuration = options.maxDuration;
+	$scope.minPlayers = options.minPlayers;
+	$scope.maxPlayers = options.maxPlayers;
+	$scope.minDifficulty = options.minDifficulty;
+	$scope.maxDifficulty = options.maxDifficulty;
+
+	//Tableau de marqueurs
+	$scope.markers = [];
+	//Option du slider périmètre
+	$scope.perimeterOptions = {
+		min: $scope.minPerimeter,
+		max: $scope.maxPerimeter,
+		step: 1
+	};
+	//Option du slider sur la durée
+	$scope.durationOptions = {
+		min: $scope.minDuration,
+		max: $scope.maxDuration,
+		step: 1
+	};
+	//Option du slider du nombre de joueurs
+	$scope.playersOptions = {
+		min: $scope.minPlayers,
+		max: $scope.maxPlayers,
+		step: 1
+	};
+	//Option du slider de la difficulté
+	$scope.difficultyOptions = {
+		min: $scope.minDifficulty,
+		max: $scope.maxDifficulty,
+		step: 1
+	};
+
+	//Id de l'événement
+	var eventId = $stateParams.id;
+	//Date d'aujourd'hui pour le calendrier
+	var nowDate = new Date();
+	//On rajoute une heure pour que l'événement ne soit pas créé imédiatement
+	nowDate.setHours(nowDate.getHours()+1);
+	//On se met à l'heure fixe
+	nowDate.setMinutes(0, 0);
+	//Données des sliders du formulaire
+	$scope.sliders = {};
+	//Si on modifie un événement (id dans l'url)
+	if(eventId) {
+		//On met a true une variable pour savoir que l'on est dans une update
+		$scope.update = true;
+		//Données du formulaire
+		$scope.event = {};
+		//Récuperation depuis l'API
+		Events.user.get({eventId : eventId}).$promise.then(function(data) {
+			//
+			if(!data.success) {
+				$rootScope.errorForm =
+					data.event;
+				$rootScope.success = "";
+				$location.path('/events');
+			}
+			$scope.event = data.event.event;
+			$scope.event.dateFin = new Date($scope.event.created).toLocaleDateString() + ' ' + new Date($scope.event.created).toLocaleTimeString()
+			$scope.coords = data.event.coords.posX + ", " + data.event.coords.posY;
+			$scope.movePosition(data.event.coords.posX, data.event.coords.posY);
+			$scope.sliders.sliderValue = $scope.event.distance;
+
+			$scope.sliders.durationValue =  $scope.event.duration;
+			$scope.sliders.difficultyValue = $scope.event.difficult;
+			$scope.sliders.playersValue = [$scope.event.min_players, $scope.event.max_players];
+
+		});
+	} else {
+		$scope.update = false;
+		$scope.event = {};
+		$scope.event.created = nowDate;
+		$scope.event.dateFin = nowDate.toLocaleDateString() + ' ' + nowDate.toLocaleTimeString()
+		$scope.sliders.sliderValue = $scope.minPerimeter;
+		$scope.sliders.durationValue = $scope.minDuration;
+		$scope.sliders.playersValue = [$scope.minPlayers, ($scope.minPlayers + 5)];
+		$scope.sliders.difficultyValue = $scope.minDifficulty;
+		$scope.difficulty = "EASY";
+	}
+
+	$scope.$watch('sliders.sliderValue', function(value) {
+		$scope.enlargePerimeter(value);
+	});
+	$scope.$watch('sliders.difficultyValue', function(value) {
+		var message = "";
+		if(value > 0 && value <= 3 ) {
+			message = "EASY";
+		} else if (value <= 6) {
+			message = "MOYEN";
+		} else if (value <= 9) {
+			message = "DIFFICILE";
+
+		} else if (value == 10) {
+			message = "HARDCORE";
+		} else {
+			$scope.sliders.difficultyValue = 1;
+		}
+		$scope.difficulty = message;
+	});
+	//
+	$scope.$on('mapInitialized', function (event, map) {
+		//Récuperation du style de map en json
+		$http.get('../json/mapStyle.json').success(function(data){
+			// Création du style de la map
+			var roadGuntherStyles = data;
+			var styledMapOptions = {name: 'FR Gunther style'};
+			var frMapGuntherStyle = new google.maps.StyledMapType(roadGuntherStyles, styledMapOptions);
+			// Ajout du style de la map
+			map.mapTypes.set('frguntherstyle', frMapGuntherStyle);
+			map.setMapTypeId('frguntherstyle');
+			// Ajout de la map
+			$scope.map = map;
+			// Fonction de geolocalisation du player
+			$scope.initiatePosition();
+
+
+		});
+	});
+
+	$scope.initiatePosition = function() {
+		if(navigator) {
+			// On recherche la position actuelle de l'utilisateur
+			navigator.geolocation.getCurrentPosition(function(position) {
+				$scope.movePosition(position.coords.latitude, position.coords.longitude);
+				var marker = $scope.createMarker(position.coords.latitude, position.coords.longitude, 'eventPos');
+				$scope.addMarker(marker);
+
+			}, function(error){
+				// Si les données de géolocalisation sont inexistante ou desactivé, on previens l'utilisateur
+				alert('code: ' + error.code + '\n' + 'message: ' + error.message + '\n');
+			});
+		} else {
+			$scope.movePosition(44.8376455,-0.5790386999999555);
+			var marker = $scope.createMarker(44.8376455,-0.5790386999999555, 'eventPos');
+			$scope.addMarker(marker);
+		}
+	}
+
+	$scope.movePosition = function(x, y) {
+		// On crée une nouvelle position google map
+		var pos = new google.maps.LatLng(x, y);
+		$scope.map.setCenter(pos);
+	}
+
+
+	$scope.createMarker = function (x, y, type) {
+		var marker = {};
+		switch(type) {
+			case "eventPos" :
+				$scope.coords= x + ", " + y;
+				var eventOptions = {
+					strokeColor: '#A2C539',
+					strokeOpacity: 0.4,
+					strokeWeight: 2,
+					fillColor: '#A2C539',
+					fillOpacity: 0.35,
+					map: $scope.map,
+					center: new google.maps.LatLng(x, y),
+					radius: $scope.event.distance ? $scope.event.distance : $scope.minPerimeter,
+					editable : true,
+					draggable : true
+				};
+				$scope.perimeter =  new google.maps.Circle(eventOptions);
+				var radius_changed =  google.maps.event.addListener($scope.perimeter, 'radius_changed', function() {
+					$scope.enlargePerimeter($scope.perimeter.getRadius());
+				});
+				var center_changed =  google.maps.event.addListener($scope.perimeter, 'center_changed', function() {
+					$scope.movePerimeter($scope.perimeter);
+				});
+				break;
+			case 'bonusPos' :
+				marker = {
+					posX:x,
+					posY:y,
+					icone:
+					{
+						path: google.maps.SymbolPath.CIRCLE,
+						fillColor: '#95DE42',
+						scale: 10,
+						fillOpacity:1,
+						strokeColor:'#1D1D1D',
+						strokeOpacity:0.5,
+						strokeWeight:3
+					},
+					anim:'DROP',
+					click: ''
+				};
+				break;
+		}
+		return marker;
+
+	}
+
+	$scope.addMarker = function (marker) {
+		$scope.$apply(function() {
+			$scope.markers.push(marker);
+		});
+	}
+
+	$scope.enlargePerimeter = function(radius) {
+		if($scope.perimeter) {
+			radius = radius <= $scope.maxPerimeter ? radius : $scope.maxPerimeter;
+			radius = radius >= $scope.minPerimeter ? radius : $scope.minPerimeter;
+			$scope.event.distance = radius;
+			if(!$scope.$$phase) {
+				$scope.$apply(function() {
+					$scope.sliders.sliderValue = radius;
+				});
+			}
+			if($scope.perimeter.getRadius() != radius) {
+				console.log('OK')
+				$scope.perimeter.setRadius(radius);
+			}
+		}
+
+	}
+	$scope.movePerimeter = function(perimeter) {
+		$scope.map.setCenter(perimeter.getCenter());
+		$scope.$apply(function() {
+			$scope.coords= perimeter.getCenter().lat() + ", " + perimeter.getCenter().lng();
+		});
+	}
+
+
+	$scope.onTimeSet = function(nd, oldDate) {
+		var newDate = new Date(nd)
+		var nowDate = new Date();
+		var isPast = newDate.getTime() < nowDate.getTime();
+		if(isPast) {
+			$scope.event.created = nowDate;
+			nowDate.setHours(nowDate.getHours()+1);
+			nowDate.setMinutes(0, 0);
+			$scope.event.dateFin = nowDate.toLocaleDateString() + ' ' + nowDate.toLocaleTimeString()
+		} else {
+			$scope.event.created = newDate;
+			$scope.event.dateFin = newDate;
+			$scope.event.dateFin = newDate.toLocaleDateString() + ' ' + newDate.toLocaleTimeString()
+		}
+	}
+
+
+	$scope.submit = function() {
+		console.log($scope.update);
+		if($scope.update == true) {
+			$scope.updateEvent();
+		} else {
+			$scope.create();
+		}
+	}
+
+	$scope.updateEvent = function() {
+		var user        = User.getUser();
+		var event       = $scope.event;
+		var event       = Event.user.update({
+			user_id     :  user.id,
+			event_id    : $scope.event.id,
+			title       : $scope.event.title,
+			description : $scope.event.description,
+			minPlayers  : $scope.sliders.playersValue[0],
+			maxPlayers  : $scope.sliders.playersValue[1],
+			distance   : $scope.sliders.sliderValue,
+			duration    : $scope.sliders.durationValue,
+			difficulty  : $scope.sliders.difficultyValue,
+			lat         : $scope.coords.split(' ,')[0],
+			lng         : $scope.coords.split(' ,')[1],
+			created     : $scope.event.created
+		});
+		event.$promise.then(function (data) {
+			if (data.success === false && data.error) {
+				if (data.error) {
+					$rootScope.errorForm = data.error;
+				}
+				$rootScope.success = "";
+			} else {
+				$scope.formData = {};
+				// clear the form so our user is ready to enter another
+				$scope.
+					newsletter = data;
+
+				$rootScope.success   = 'Félicitation, la modification de l\'événement est un succès !';
+				$rootScope.errorForm = "";
+				$location.path('/events');
+			}
+		}, function (error) {
+			$rootScope.errorForm =
+				"Une erreure a empéché la modification de l'évenement, merci de réessayer."
+			$rootScope.success = "";
+		});
+	}
+
+	$scope.create = function() {
+		var user = User.getUser();
+		var event = Event.user.create({
+			user_id : user.id,
+			title : $scope.event.title,
+			description : $scope.event.description,
+			minPlayers : $scope.sliders.playersValue[0],
+			maxPlayers : $scope.sliders.playersValue[1],
+			distance : $scope.sliders.sliderValue,
+			duration : $scope.sliders.durationValue,
+			difficulty : $scope.sliders.difficultyValue,
+			lat :  $scope.coords.split(' ,')[0],
+			lng :  $scope.coords.split(' ,')[1],
+			created : $scope.event.created
+		});
+		event.$promise.then(function (data) {
+			if (data.success === false && data.error) {
+				if (data.error) {
+					$rootScope.errorForm = data.error;
+				}
+				$rootScope.success = "";
+			} else {
+				$scope.formData = {};
+				// clear the form so our user is ready to enter another
+				$scope.
+					newsletter = data;
+
+				$rootScope.success   = 'Félicitation, la création de l\'événement est un succès !';
+				$rootScope.errorForm = "";
+				$location.path('/events');
+			}
+		}, function (error) {
+			$rootScope.errorForm =
+				"Une erreure a empéché la création de l'évenement, merci de réessayer."
+			$rootScope.success = "";
+		});
+	}
+});
 
 app.controller('EventsDetailsCtrl', function ($scope) {
 	//Récupération de l'événement
