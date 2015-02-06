@@ -1,12 +1,12 @@
 'use strict';
-var app = angular.module('Guntherandthehunters.controllers', ['ngMap'])
+var app = angular.module('Guntherandthehunters.controllers', ['ngMap', 'ng'])
 
 /************************/
 /******** CORE **********/
 /************************/
 
 //Coeur de l'application
-app.controller('CoreCtrl', function($scope, $http, User, AlertService) {
+app.controller('CoreCtrl', function($scope, $http, $q, User, AlertService, CURRENTUSER) {
 
 	// On initialise le scope des boutons du menu
 	$scope.list = [];
@@ -16,37 +16,49 @@ app.controller('CoreCtrl', function($scope, $http, User, AlertService) {
     	$scope.list = data.boutons;
     });
 
-    /*$scope.getStorageToken = function(){
-    	var deferred = Q.defer();
-
-    	var tok = localStorage.getItem('token');
-
-		console.log("Recuperation en LocalStorage du token: ",tok);
-
+    $scope.getStorageToken = function(){
+    	var deferred = $q.defer(); 
+    	deferred.resolve(localStorage.getItem('token'));
 		return deferred.promise;
     }
 
-    //var toto = getStorageToken();
+    var tokenTmp = $scope.getStorageToken();
 
-    if(tok = 'undefined'){
-			console.log("pas de tok");
+    tokenTmp.then(function(token){
+    	$scope.verifToken(token);
+    }, function(err){
+    	console.log("error dans le getStorageToken");
+    	AlertService.add('error', 'Error !', 'Veuillez contacter le support du jeu.');
+		$scope.goToState('auth.login');
+    })
+
+  	$scope.verifToken = function(token){
+  		console.log("Le token recuperé: ",token);
+
+  		if(token == "undefined"){
+  			console.log("toto1");
 			AlertService.add('error', 'Attention !', 'Veuillez vous identifier avant d\'acceder au jeu');
 			$scope.goToState('auth.login');
 	  	}else{
-	  		console.log("Il y a un token dans le local storage");
-	  		var tempUser = User.isLoggedIn.isLoggedIn({access_token : tok});
+	  		console.log("toto2");
+
+	  		var tempUser = User.isLoggedIn.isLoggedIn({access_token : token});
 		  	tempUser.$promise.then(function(result) {
+		  		console.log("je suis passé dans le islogged du user: ", result);
 		  		if(result){
 		  			if(!result.isLoggedIn){
 		  				AlertService.add('error', 'Attention !', 'Veuillez vous identifier avant d\'acceder au jeu');
 			  			$scope.goToState('auth.login');
+			  		}else{
+			  			console.log("BLABLALBLALLFQd", result.user.user);
 			  		}
 		  		}else{
 		  			AlertService.add('error', 'Attention !', 'Problème au sein du serveur Gunther, veuillez contacter un administrateur!');
 		  			$scope.goToState('auth.login');
 		  		}	
 		  	});
-	  	}*/
+	  	}
+  	}
 })
 
 // Controller general à l'ensemble de l'application
@@ -63,7 +75,7 @@ app.controller('ConfigCtrl', function($scope, $state, $rootScope, $http) {
 /******* GENERAL ********/
 /***********************/
 
-app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPlatform,$timeout, $http, SOCKET_URL) {
+app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPlatform,$timeout, $http, SOCKET_URL, CURRENTUSER) {
 	
 	var socket = io.connect(SOCKET_URL, {'force new connection': true, path: '/socket.io'});
 
@@ -136,7 +148,6 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPla
 					posY:position.coords.longitude
 				};
 
-				console.log("Envoi d'un nouveau player: ", posPlayer);
 				socket.emit('newUser', posPlayer);
 
 				// On rerajoute le joueur a sa nouvelle position
@@ -162,8 +173,6 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPla
 
 	// Incoming
 	socket.on('broadcastPositions', function(datas) {
-
-		console.log("Données envoyé par le socket du serveur: ", datas);
 
 		var tmpData = [];
 
@@ -194,7 +203,6 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPla
 	});
 
 	socket.on('userPositionChange', function(data) {
-		console.log("un user a changé de position", data);
 
 		if(data.user == randomId){
 			console.log("J'ai moi meme bougé donc je vais deplacer mon marker");
@@ -203,13 +211,9 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPla
 			var pos = new google.maps.LatLng(data.posX, data.posY);
 			$scope.movePlayer(pos);
 
-			console.log($scope.map.markers);
-			console.log($scope.ennemy);
-
 			for (var i = 0; i < $scope.ennemy.length; i++) {
 
 				var tmp = $scope.ennemy[i];
-				console.log(tmp);
 				if(data.user == tmp){
 					console.log("hihi");
 				}
@@ -235,8 +239,8 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPla
 	});
 
 	$scope.$watch('posPlayers', function(newValue, oldValue) {
-		console.log($scope.player)
-		console.log($scope.posPlayers);
+		//console.log($scope.player)
+		//console.log($scope.posPlayers);
   		for (var i = $scope.posPlayers.length - 1; i >= 0; i--) {
   			$scope.posPlayers[i]
   			$scope.ennemy.push($scope.createMarker(pos));
@@ -597,7 +601,7 @@ app.controller('AuthCtrl', function($scope, $state, $rootScope, User) {
 app.controller('AuthLoginCtrl', function($scope, $state, $rootScope, User, AlertService) {
 
 	$scope.user = {};
-	$scope.messagesInfo = $rootScope.messagesInfo;	
+	$scope.messagesInfo = $rootScope.messagesInfo;
 
 	$scope.authenticate = function(params){
 		if(!params){
@@ -606,13 +610,11 @@ app.controller('AuthLoginCtrl', function($scope, $state, $rootScope, User, Alert
 
 			var promise = User.login.loginUser({email: params.login, password: params.password});
 			promise.$promise.then(function(result){
-				console.log(result);
 				if(result.error) {
 					AlertService.add('error', 'Attention !', result.error);
 				} else if(result.user) {
 					AlertService.add('succes', 'Félicitation !', result.user);
 					localStorage.setItem("token", result.user.token);
-					console.log("Insert en LocalStorage du token: ", result.user.token);
 					$state.go('core.map');
 				}
 			}, 
@@ -631,7 +633,6 @@ app.controller('AuthRegisterCtrl', function($scope, $state, $rootScope, User, Al
 
 	$scope.user = {};
 	$scope.messagesInfo = $rootScope.messagesInfo;	
-	console.log("toto");
 	$scope.register = function(params){
 		if(!params){
 			AlertService.add('error', 'Attention !', 'Aucune informations recuperer, veuillez remplir l\'ensemble des champs pour pouvoir vous inscrire !');
