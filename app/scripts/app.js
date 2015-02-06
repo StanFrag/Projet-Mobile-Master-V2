@@ -6,7 +6,7 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-angular.module('Guntherandthehunters', ['ngResource', 'ionic', 'config', 'Guntherandthehunters.controllers', 'Guntherandthehunters.services', 'ui.bootstrap.datetimepicker'])
+angular.module('Guntherandthehunters', ['ngResource', 'ionic', 'config', 'Guntherandthehunters.controllers', 'Guntherandthehunters.services', 'ui.bootstrap-slider', 'ui.bootstrap.datetimepicker'])
 
 .run(function($ionicPlatform, $rootScope) {
   $rootScope.messagesInfo = [];

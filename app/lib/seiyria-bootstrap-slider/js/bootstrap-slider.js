@@ -37,17 +37,17 @@
 			this.picker = parent;
 		} else {
 			this.picker = $('<div class="slider">'+
-								'<div class="slider-track">'+
-									'<div class="slider-selection"></div>'+
-									'<div class="slider-handle"></div>'+
-									'<div class="slider-handle"></div>'+
-								'</div>'+
-								'<div id="tooltip" class="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>'+
-								'<div id="tooltip_min" class="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>'+
-								'<div id="tooltip_max" class="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>'+
-							'</div>')
-								.insertBefore(this.element)
-								.append(this.element);
+			'<div class="slider-track">'+
+			'<div class="slider-selection"></div>'+
+			'<div class="slider-handle"></div>'+
+			'<div class="slider-handle"></div>'+
+			'</div>'+
+			'<div id="tooltip" class="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>'+
+			'<div id="tooltip_min" class="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>'+
+			'<div id="tooltip_max" class="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>'+
+			'</div>')
+				.insertBefore(this.element)
+				.append(this.element);
 		}
 
 		this.id = this.element.data('slider-id')||options.id;
@@ -239,7 +239,7 @@
 		}
 
 		this.enabled = options.enabled &&
-						(this.element.data('slider-enabled') === undefined || this.element.data('slider-enabled') === true);
+		(this.element.data('slider-enabled') === undefined || this.element.data('slider-enabled') === true);
 		if(this.enabled) {
 			this.enable();
 		} else {
@@ -254,12 +254,12 @@
 		inDrag: false,
 
 		showTooltip: function(){
-            if (this.tooltip_split === false ){
-                this.tooltip.addClass('in');
-            } else {
-                this.tooltip_min.addClass('in');
-                this.tooltip_max.addClass('in');
-            }
+			if (this.tooltip_split === false ){
+				this.tooltip.addClass('in');
+			} else {
+				this.tooltip_min.addClass('in');
+				this.tooltip_max.addClass('in');
+			}
 
 			this.over = true;
 		},
@@ -292,16 +292,16 @@
 				this.selectionElStyle.left = Math.min(positionPercentages[0], positionPercentages[1]) +'%';
 				this.selectionElStyle.width = Math.abs(positionPercentages[0] - positionPercentages[1]) +'%';
 
-                var offset_min = this.tooltip_min[0].getBoundingClientRect();
-                var offset_max = this.tooltip_max[0].getBoundingClientRect();
+				var offset_min = this.tooltip_min[0].getBoundingClientRect();
+				var offset_max = this.tooltip_max[0].getBoundingClientRect();
 
-                if (offset_min.right > offset_max.left) {
-                    this.tooltip_max.removeClass('top');
-                    this.tooltip_max.addClass('bottom')[0].style.top = 18 + 'px';
-                } else {
-                    this.tooltip_max.removeClass('bottom');
-                    this.tooltip_max.addClass('top')[0].style.top = -30 + 'px';
-                }
+				if (offset_min.right > offset_max.left) {
+					this.tooltip_max.removeClass('top');
+					this.tooltip_max.addClass('bottom')[0].style.top = 18 + 'px';
+				} else {
+					this.tooltip_max.removeClass('bottom');
+					this.tooltip_max.addClass('top')[0].style.top = -30 + 'px';
+				}
 			}
 
 			if (this.range) {
@@ -310,10 +310,10 @@
 				);
 				this.tooltip[0].style[this.stylePos] = this.size * (positionPercentages[0] + (positionPercentages[1] - positionPercentages[0])/2)/100 - (this.orientation === 'vertical' ? this.tooltip.outerHeight()/2 : this.tooltip.outerWidth()/2) +'px';
 
-                this.tooltipInner_min.text(
+				this.tooltipInner_min.text(
 					this.formater(this.value[0])
 				);
-                this.tooltipInner_max.text(
+				this.tooltipInner_max.text(
 					this.formater(this.value[1])
 				);
 
@@ -372,9 +372,9 @@
 			var val = this.calculateValue();
 			this.setValue(val);
 			this.element.trigger({
-					type: 'slideStart',
-					value: val
-				})
+				type: 'slideStart',
+				value: val
+			})
 				.data('value', val)
 				.prop('value', val);
 			return true;
@@ -503,12 +503,12 @@
 			var val;
 			if (this.range) {
 				val = [this.min,this.max];
-                if (this.percentage[0] !== 0){
-                    val[0] = (Math.max(this.min, this.min + Math.round((this.diff * this.percentage[0]/100)/this.step)*this.step));
-                }
-                if (this.percentage[1] !== 100){
-                    val[1] = (Math.min(this.max, this.min + Math.round((this.diff * this.percentage[1]/100)/this.step)*this.step));
-                }
+				if (this.percentage[0] !== 0){
+					val[0] = (Math.max(this.min, this.min + Math.round((this.diff * this.percentage[0]/100)/this.step)*this.step));
+				}
+				if (this.percentage[1] !== 100){
+					val[1] = (Math.min(this.max, this.min + Math.round((this.diff * this.percentage[1]/100)/this.step)*this.step));
+				}
 				this.value = val;
 			} else {
 				val = (this.min + Math.round((this.diff * this.percentage[0]/100)/this.step)*this.step);
