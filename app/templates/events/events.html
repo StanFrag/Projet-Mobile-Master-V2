@@ -1,17 +1,47 @@
-<ion-view title="Dashboard">
-  <ion-content class="has-header padding">
-    <h1>Dash</h1>
+<ion-view title="evenements">
+  <ion-content class="has-header padding eventList" scroll="false">
+    <ion-tabs class="tabs-dark tabs-icon-only">
+
+
+
+      <ion-tab title="Liste" icon="ion-navicon-round" href="#/events">
+        <div class="tabs-striped tabs-top tabs-background-positive tabs-color-green">
+          <div class="tabs">
+            <a class="tab-item active" href="#">
+              Tous
+            </a>
+            <a class="tab-item" href="#">
+              Créés
+            </a>
+          </div>
+        </div>
+        <div class="tabContent">
+          <ul>
+            <li ng-repeat="e in events" class="event">
+              <div class="infosEvent">
+                <div class="dateEvent">
+                  {{ e.event.created }}
+                </div>
+                <div class="title">
+                  <h2>{{ e.event.title }}</h2>
+
+                </div>
+                <div class="participantsEvent">
+                  {{ e.participants.length }} / {{ e.event.max_players }}
+                </div>
+              </div>
+              <div class="clear"></div>
+              <div>
+
+              </div>
+            </li>
+          </ul>
+        </div>
+      </ion-tab>
+      <ion-tab title="Ajout" icon="ion-plus" href="#/events/add">
+
+      </ion-tab>
+
+    </ion-tabs>
   </ion-content>
 </ion-view>
-
-<ion-footer-bar align-title="left" class="bar-dark">
-  <div class="buttons">
-    <button class="button">Left Button</button>
-  </div>
-
-  <h1 class="title">Title!</h1>
-  
-  <div class="buttons" ng-click="doSomething()">
-    <button class="button">Right Button</button>
-  </div>
-</ion-footer-bar>

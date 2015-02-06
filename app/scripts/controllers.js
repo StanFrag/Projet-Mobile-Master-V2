@@ -27,30 +27,25 @@ app.controller('CoreCtrl', function($scope, $http, $q, User, AlertService, CURRE
     tokenTmp.then(function(token){
     	$scope.verifToken(token);
     }, function(err){
-    	console.log("error dans le getStorageToken");
     	AlertService.add('error', 'Error !', 'Veuillez contacter le support du jeu.');
 		$scope.goToState('auth.login');
     })
 
   	$scope.verifToken = function(token){
-  		console.log("Le token recuperé: ",token);
 
   		if(token == "undefined"){
-  			console.log("toto1");
 			AlertService.add('error', 'Attention !', 'Veuillez vous identifier avant d\'acceder au jeu');
 			$scope.goToState('auth.login');
 	  	}else{
-	  		console.log("toto2");
 
 	  		var tempUser = User.isLoggedIn.isLoggedIn({access_token : token});
 		  	tempUser.$promise.then(function(result) {
-		  		console.log("je suis passé dans le islogged du user: ", result);
 		  		if(result){
 		  			if(!result.isLoggedIn){
 		  				AlertService.add('error', 'Attention !', 'Veuillez vous identifier avant d\'acceder au jeu');
 			  			$scope.goToState('auth.login');
 			  		}else{
-			  			console.log("BLABLALBLALLFQd", result.user.user);
+
 			  		}
 		  		}else{
 		  			AlertService.add('error', 'Attention !', 'Problème au sein du serveur Gunther, veuillez contacter un administrateur!');
@@ -132,7 +127,7 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPla
 	$scope.initiatePlayer= function(){
 		// On affiche la barre de chargement
 		$ionicLoading.show({
-			template: 'Loading...'
+			template: 'Chargement...'
 		});
 
 		// Une fois que la plateforme ionic est prete
@@ -205,7 +200,6 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPla
 	socket.on('userPositionChange', function(data) {
 
 		if(data.user == randomId){
-			console.log("J'ai moi meme bougé donc je vais deplacer mon marker");
 			
 
 			var pos = new google.maps.LatLng(data.posX, data.posY);
@@ -215,7 +209,7 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPla
 
 				var tmp = $scope.ennemy[i];
 				if(data.user == tmp){
-					console.log("hihi");
+
 				}
 			}
 
@@ -223,24 +217,18 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPla
 			console.log("Un joueur adverse à effectué un mouvement");
 
 			for (var i = 0; i < $scope.ennemy.length + 1; i++) {
-				console.log("je passe::", $scope.ennemy[i]);
 
 				if(data.user == $scope.map.markers[i].id){
-					console.log("hihi");
 				}
 			}
 		}
 	});
 
 	socket.on('posCreated', function(data) {
-		console.log("Données envoyé par le socket du serveur: ", data);
 		$scope.posPlayers.push(data);
-		console.log($scope.posPlayers);
 	});
 
 	$scope.$watch('posPlayers', function(newValue, oldValue) {
-		//console.log($scope.player)
-		//console.log($scope.posPlayers);
   		for (var i = $scope.posPlayers.length - 1; i >= 0; i--) {
   			$scope.posPlayers[i]
   			$scope.ennemy.push($scope.createMarker(pos));
@@ -255,8 +243,6 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPla
 			posX:position.k,
 			posY:position.D
 		};
-
-		console.log("Envoi vers le serveur de l'objet: ", posPlayer)
 
 		socket.emit('watchPosition', posPlayer);
 	}
@@ -305,13 +291,12 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPla
 
 	navigator.geolocation.watchPosition(
 		function(position) {
-			console.log("Mouvement du joueur intercepté")
 			var pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
 			$scope.createPosPlayer(pos);
 
 		}, function(error){
 			//alert('code: '    + error.code    + '\n' + 'message: ' + error.message + '\n');
-			console.log("erreur dans la geoloc")
+			console.log(error)
 		}, { 
 			maximumAge: 5000,
 			timeout: 10000, 
@@ -506,28 +491,81 @@ app.controller('ChatCtrl', function ($scope) {
 	}
 })
 
-app.controller('EventsCtrl', function ($scope) {
+app.controller('EventsCtrl', function ($scope, User, Event, $ionicLoading, AlertService) {
+
 	//Initialisation du tableau d'événements
 	$scope.events = [];
 	//Initialisation du tableau de filtres
 	$scope.filters = {
 		limit : 10,
 		offset : 0,
-		filter : ''
+		filter : '',
+		hisEvents : 0
 	};
 
 	//Vue d'affichage des filtres d'affichage des events
 	$scope.openFilter = function() {
 
 	}
-	//Fonction de récupération des événements
-	$scope.getEvents = function(limit, offset, filter) {
 
+	//Fonction de récupération des événements
+	$scope.getEvents = function(limit, offset, filter, hisEvents) {
+		if(hisEvents) {
+			var id = $scope.user.id;
+			console.log($scope.user);
+		}
+
+		var promiseEvents = Event.user.get({limit : limit, offset : offset, filter : filter, id : id});
+		promiseEvents.$promise.then(function(data) {
+			if(data.success) {
+				console.log(data)
+				//On ajoute les événements au tableau éxistant
+				$scope.events= $scope.events.concat(data.events);
+				$ionicLoading.hide();
+			} else {
+				AlertService.add('error', 'Erreur,', data.error);
+				$ionicLoading.hide();
+			}
+		}, function(error) {
+			AlertService.add('error', 'Erreur,', 'Nous n\'avons pas reussi à contacter le service, merci de réessayer plus tard.');
+			$ionicLoading.hide();
+		})
 	}
 	//Récupère plus d'événements au scroll de l'utilisateur
 	$scope.getMoreEvents = function() {
 
 	}
+	var tokenTmp = $scope.getStorageToken();
+
+	tokenTmp.then(function(token){
+		var tempUser = User.isLoggedIn.isLoggedIn({access_token : token});
+		tempUser.$promise.then(function(result) {
+			if(result){
+				if(!result.isLoggedIn){
+					AlertService.add('error', 'Attention !', 'Veuillez vous identifier avant d\'acceder au jeu');
+					$scope.goToState('auth.login');
+				}else{
+					$scope.user = result.user;
+					//Initialisation
+					$scope.initialize = function(filters) {
+						// On affiche la barre de chargement
+						$ionicLoading.show({
+							template: 'Chargement...'
+						});
+						$scope.getEvents(filters.limit, filters.offset, filters.filter, filters.hisEvents);
+					}($scope.filters);
+				}
+			}else{
+				AlertService.add('error', 'Attention !', 'Problème au sein du serveur Gunther, veuillez contacter un administrateur!');
+				$scope.goToState('auth.login');
+			}
+		});
+	}, function(err){
+		AlertService.add('error', 'Error !', 'Veuillez contacter le support du jeu.');
+		$scope.goToState('auth.login');
+	})
+
+
 })
 
 app.controller('EventsDetailsCtrl', function ($scope) {
@@ -636,9 +674,7 @@ app.controller('RulesCtrl', function ($scope) {})
 
 app.controller('AuthCtrl', function($scope, $state, $rootScope, User) {
 
-	var tok = localStorage.getItem('token');	
-
-	console.log("Recuperation en LocalStorage du token: ",tok);
+	var tok = localStorage.getItem('token');
 
 	if(tok)
 	{
@@ -718,11 +754,9 @@ app.controller('AuthForgotCtrl', function($scope, $state, $rootScope, User, Aler
 	$scope.user = {};
 
 	$scope.forgot = function(email){
-		console.log(email);
 		if(email){
 			var promise = User.forgot.resetPassword({email : email});
 			promise.$promise.then(function(result) {
-				console.log(result);
 				if(result.error) {
 					AlertService.add('error', 'Attention !', result.error);
 				} else if(result.user) {

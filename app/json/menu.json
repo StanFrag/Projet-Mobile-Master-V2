@@ -2,7 +2,11 @@
   "boutons": [{
     "text": "Carte",
     "link": "core.map"
-  }, 
+  },
+  {
+    "text": "Profil",
+    "link": "core.profil"
+  },
   {
     "text": "Evenements",
     "link": "core.events"
@@ -10,7 +14,7 @@
   {
     "text": "Amis",
     "link": "core.friends"
-  }, 
+  },
   {
     "text": "Parties",
     "link": "core.party"

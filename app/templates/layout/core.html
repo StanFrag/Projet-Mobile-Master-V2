@@ -7,7 +7,7 @@
 	  		Bouton de back
 	  	-->
 	    <ion-nav-bar type="bar-clear" class="bar-dark" animation="nav-title-slide-ios7">
-	    	<ion-nav-back-button class="button-clear"><i class="icon ion-reply"></i>  Back</ion-nav-back-button>
+	    	<ion-nav-back-button class="button-clear"><i class="icon ion-reply"></i></ion-nav-back-button>
 	    </ion-nav-bar>
 
 	    <!-- 
@@ -20,6 +20,30 @@
 	    	<h1>Menu</h1>
 		</ion-content>
 
+		<!--
+			Message d'alert de l'utilisateur
+		-->
+		<div class="alerts">
+			<div ng-repeat="alert in alerts" class="alert animation alert-{{alert.type}}">
+				<div class="row">
+
+					<div class="col col-90">
+						<h4>
+							{{ alert.title}}
+						</h4>
+						{{ alert.msg }}
+					</div>
+
+					<div class="col col-10">
+						<button type="button" class="close" ng-click="alert.close()" aria-hidden="true">
+							×
+						</button>
+					</div>
+
+					<!---->
+				</div>
+			</div>
+		</div>
 		<!-- 
 	  		Permet de descendre d'un niveau d'arborescence
 	  	-->
@@ -36,6 +60,7 @@
 					{{item.text}}
 				</ion-item>
 			</ion-list>
+
 		</ion-content>
 	</ion-side-menu>
 </ion-side-menus>

@@ -4,6 +4,14 @@
     src: url(../fonts/DigitalFirebomb.ttf);
 }
 
+$black : #1A1A1A;
+$green : #A2C539;
+$darkblue : #1A2D4D;
+$blue : #64C5E9;
+$purple : #592266;
+$premium : #DDC657;
+$red : #CC2727;
+
 /**************************/
 /****** Utilitaires *******/
 /**************************/
@@ -72,12 +80,100 @@ h1{
 	text-decoration: underline;
 }
 
+
+
+/**************************/
+/**** TEMPLATE GENERAL ****/
+/**************************/
+
+.bar-header, .bar-footer, .tabs {
+  background-color: #1A1A1A!important;
+}
+
+.bar .button {
+  background-color: transparent!important;
+  border: none!important;
+  font-size: 3em;
+}
+
+.pull-center {
+  margin : 0 auto;
+}
+
+.tabs-top > .tabs, .tabs.tabs-top {
+  top : 0!important
+}
+
+.tabs-color-green a {
+  color : white!important;
+  font-size : 1.2em;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.tabs-color-green a.active {
+  color : $green!important;
+  border-bottom: 1px solid $green!important;
+
+}
+
+.title  {
+  font-size : 1.5em!important;
+}
+
+.clear {
+  clear: both;
+}
+
+/**************************/
+/********** EVENTS **********/
+/**************************/
+
+.eventList {
+  background-color: $darkblue;
+}
+
+.tabContent {
+  position: absolute;
+  z-index: 5;
+  width: 100%;
+  top : 50px;
+  color : white;
+  .event {
+    font-size: 1.3em;
+    width: 100%;
+    border-top: 3px solid $green;
+    padding: 10px 10px 0 10px;
+    .infosEvent {
+      div {
+        float: left;
+      }
+      .dateEvent {
+        width: 20%;
+      }
+      .participantsEvent {
+        width: 20%;
+      }
+      .title {
+        width: 60%;
+        h2 {
+          color : $green;
+          font-weight: bold;
+        }
+      }
+    }
+  }
+  .event:first-child {
+    border-top: none;
+
+  }
+}
 /**************************/
 /********** MENU **********/
 /**************************/
 
 #menu{
-	background-color:#2E2E2E;
+	background-color:#1A1A1A;
 }
 
 .listItemMenu{
@@ -88,9 +184,10 @@ h1{
 	padding: 0;
 	padding-top:15px;
 	padding-bottom:15px;
-	border: 1px solid #ffffff;
+  border : none;
+	border-bottom: 2px solid #ffffff;
 	color:white;
-	background-color:#4A4A4A;
+	background-color:#1A1A1A;
 }
 
 /**************************/
@@ -187,15 +284,15 @@ tab-item:active{
 }
 
 .alert-succes{
-	background-color:#25DD41;
+	background-color:$green;
 }
 
 .alert-info{
-	background-color:#5389E2;
+	background-color:$blue;
 }
 
 .alert-error{
-	background-color:#EF2B2B;
+	background-color:$red;
 }
 
 .alerts .alert {

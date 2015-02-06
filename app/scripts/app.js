@@ -50,6 +50,11 @@ angular.module('Guntherandthehunters', ['ngResource', 'ionic', 'config', 'Gunthe
       controller : 'EventsCtrl',
       templateUrl: 'templates/events/events.html'
     })
+    .state('core.profil', {
+      url: "/profil",
+      controller : 'ProfilCtrl',
+      templateUrl: 'templates/events/events.html'
+    })
 
     .state('core.friends', {
       url: "/friends",
