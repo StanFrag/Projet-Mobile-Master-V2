@@ -494,7 +494,7 @@ app.controller('ChatCtrl', function ($scope) {
 	}
 })
 
-app.controller('EventsCtrl', function ($scope, User, Event, $ionicLoading, AlertService, $http) {
+app.controller('EventsCtrl', function ($scope, User, Event, $ionicLoading, AlertService, $http, $q) {
 
 	//Initialisation du tableau d'événements
 	$scope.events = [];
@@ -538,10 +538,58 @@ app.controller('EventsCtrl', function ($scope, User, Event, $ionicLoading, Alert
 		var promiseEvents = Event.user.get({limit : limit, offset : offset, filter : filter, id : id});
 		promiseEvents.$promise.then(function(data) {
 			if(data.success) {
-				console.log(data.events);
-				//On ajoute les événements au tableau éxistant
-				$scope.events= $scope.events.concat(data.events);
-				$ionicLoading.hide();
+				var deferred = $q.defer();
+				var promises = [];
+				var url="https://maps.googleapis.com/maps/api/place/nearbysearch/json?KEY=AIzaSyDjtiAbO0DsvPNTWhWW0draH_L8fnOvEic";
+				var getAddresses = function(events) {
+
+					for(var i = events.length-1 ; i >= 0; i--) {
+						var promise = function(event) {
+							var defer2 = $q.defer();
+							var geocoder = new google.maps.Geocoder();
+							var location = new google.maps.LatLng(event.coords.posX, event.coords.posY);
+							geocoder.geocode( { 'location': location}, function(results, status) {
+								if (status == google.maps.GeocoderStatus.OK) {
+									event.coords.address = results[2].formatted_address;
+									deferred.resolve(event);
+
+								} else {
+									alert("Geocode was not successful for the following reason: " + status);
+								}
+							});
+							/*var address = $http.get(url+"location="+event.coords.posX+"&,"+event.coords.posY);
+							address.then(function(data) {
+
+								console.log(data)
+							})*/
+								/*.$promise.then(function(data) {
+									console.log(data);
+									deferred.resolve(event);
+								})*/
+							return defer2.promise;
+						}(events[i])
+
+						//On ajoute la promesse dans le tableau
+						promises.push(promise);
+					}
+					return deferred.promise;
+				} (data.events);
+
+				//Une fois que toutes les promesses sont résolues
+				$q.all(promises).then(function(result) {
+					//On résout la promesse N1
+					deferred.resolve(result);
+				} , function (reason) {
+					//On affiche l'erreur en console (DEV MOD)
+					console.error(reason);
+				})
+
+				getAddresses.then(function(events) {
+					//On ajoute les événements au tableau éxistant
+					$scope.events= $scope.events.concat(data.events);
+					$ionicLoading.hide();
+				})
+
 			} else {
 				AlertService.add('error', 'Erreur,', data.error);
 				$ionicLoading.hide();
@@ -588,7 +636,20 @@ app.controller('EventsCtrl', function ($scope, User, Event, $ionicLoading, Alert
 
 })
 
-app.controller('AddEventCtrl', function($scope, $http, Event, User, $stateParams, $ionicSideMenuDelegate) {
+app.controller('AddEventCtrl', function(AlertService, $scope, $http, Event, User, $stateParams, $ionicSideMenuDelegate) {
+	var tokenTmp = $scope.getStorageToken();
+
+	tokenTmp.then(function(token) {
+		var tempUser = User.isLoggedIn.isLoggedIn({access_token: token});
+		tempUser.$promise.then(function (result) {
+			if(!result.isLoggedIn){
+				AlertService.add('error', 'Attention !', 'Veuillez vous identifier avant d\'acceder au jeu');
+				$scope.goToState('auth.login');
+			}else {
+				$scope.user = result.user;
+			}
+		})
+	});
 	//On empêche le drag menu sur cette page
 	$ionicSideMenuDelegate.canDragContent(false);
 	$scope.coords = "44.8376455, -0.5790386999999555";
@@ -853,8 +914,8 @@ app.controller('AddEventCtrl', function($scope, $http, Event, User, $stateParams
 			distance   : $scope.sliders.sliderValue,
 			duration    : $scope.sliders.durationValue,
 			difficulty  : $scope.sliders.difficultyValue,
-			lat         : $scope.coords.split(' ,')[0],
-			lng         : $scope.coords.split(' ,')[1],
+			lat         : $scope.coords.split(',')[0],
+			lng         : $scope.coords.split(',')[1],
 			created     : $scope.event.created
 		});
 		event.$promise.then(function (data) {
@@ -869,19 +930,19 @@ app.controller('AddEventCtrl', function($scope, $http, Event, User, $stateParams
 				$scope.
 					newsletter = data;
 
-				$rootScope.success   = 'Félicitation, la modification de l\'événement est un succès !';
-				$rootScope.errorForm = "";
-				$location.path('/events');
+				AlertService.add('succes', 'Félicitation !', 'La modification de l\'événement est un succès.');
+				$scope.goToState('core.events');
 			}
 		}, function (error) {
-			$rootScope.errorForm =
-				"Une erreure a empéché la modification de l'évenement, merci de réessayer."
-			$rootScope.success = "";
+			AlertService.add('error', 'Erreur !', 'La modification de l\'événement a echoué, merci de réessayer.');
 		});
 	}
 
+
 	$scope.create = function() {
-		var user = User.getUser();
+		console.log($scope.event)
+		var user = $scope.user.user;
+		console.log(user)
 		var event = Event.user.create({
 			user_id : user.id,
 			title : $scope.event.title,
@@ -891,8 +952,8 @@ app.controller('AddEventCtrl', function($scope, $http, Event, User, $stateParams
 			distance : $scope.sliders.sliderValue,
 			duration : $scope.sliders.durationValue,
 			difficulty : $scope.sliders.difficultyValue,
-			lat :  $scope.coords.split(' ,')[0],
-			lng :  $scope.coords.split(' ,')[1],
+			lat :  $scope.coords.split(',')[0],
+			lng :  $scope.coords.split(',')[1],
 			created : $scope.event.created
 		});
 		event.$promise.then(function (data) {
@@ -907,16 +968,14 @@ app.controller('AddEventCtrl', function($scope, $http, Event, User, $stateParams
 				$scope.
 					newsletter = data;
 
-				$rootScope.success   = 'Félicitation, la création de l\'événement est un succès !';
-				$rootScope.errorForm = "";
-				$location.path('/events');
+				AlertService.add('succes', 'Félicitation !', 'la création de l\'événement est un succès.');
+				$scope.goToState('core.events');
 			}
 		}, function (error) {
-			$rootScope.errorForm =
-				"Une erreure a empéché la création de l'évenement, merci de réessayer."
-			$rootScope.success = "";
+			AlertService.add('succes', 'Erreur !', 'Une erreur a empeché la création de l\'évenement, merci de réessayer.');
 		});
 	}
+
 
 
 	$scope.submit = function() {

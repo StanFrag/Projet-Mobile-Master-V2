@@ -142,15 +142,34 @@ h1{
   .event {
     font-size: 1.3em;
     width: 100%;
-    border-top: 3px solid $green;
+    border-top: 5px solid $green;
     .mapEvent {
-      height: 150px;
+      height: 50px;
+      overflow: hidden;
+      .containerMap {
+        width: 100%;
+        height: 150px;
+        position: relative;
+        h3 {
+          z-index : 5;
+          top : 10px;
+          left : 10px;
+          position: absolute;text-shadow: 2px 2px $black;
+        }
+        map {
+          z-index : 4;
+          position: absolute;
+
+        }
+      }
     }
 
     .infosEvent {
       padding: 10px;
       div {
         float: left;
+        text-align: center;
+        font-weight: bold;
       }
       .dateEvent {
         width: 20%;
@@ -161,8 +180,8 @@ h1{
       .title {
         width: 60%;
         h2 {
+          font-size: 0.9em;
           color : $green;
-          font-weight: bold;
         }
       }
     }
@@ -183,7 +202,7 @@ h1{
     color : white;
     font-weight: bold;
   }
-  input {
+  input, textarea {
     padding : 10px;
   }
   p {

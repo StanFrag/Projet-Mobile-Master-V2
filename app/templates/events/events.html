@@ -21,7 +21,8 @@
               <li ng-repeat="e in events" class="event">
                 <div class="infosEvent">
                   <div class="dateEvent">
-                    {{ e.event.created | date:'yyyy-MM-dd'}}
+                    {{ e.event.created | date:'dd-MM-yyyy'}} <br/>
+                    {{ e.event.created | date:'HH:mm'}}
                   </div>
                   <div class="title">
                     <h2>{{ e.event.title }}</h2>
@@ -33,18 +34,21 @@
                 </div>
                 <div class="clear"></div>
                 <div class="mapEvent">
-                  <map center="{{ e.coords.posX }}, {{ e.coords.posY }}"
-                       zoom="8"
-                       disable-default-u-i="true"
-                       disable-double-click-zoom="false"
-                       draggable="false"
-                       draggable-cursor="finger"
-                       dragging-cursor="move"
-                       keyboard-shortcuts="false"
-                       max-zoom="20"
-                       min-zoom="2"
-                       tilt="45">
-                  </map>
+                  <div class="containerMap">
+                    <h3>{{e.coords.address}}</h3>
+                    <map center="{{ e.coords.posX }}, {{ e.coords.posY }}"
+                         zoom="8"
+                         disable-default-u-i="true"
+                         disable-double-click-zoom="false"
+                         draggable="false"
+                         draggable-cursor="finger"
+                         dragging-cursor="move"
+                         keyboard-shortcuts="false"
+                         max-zoom="20"
+                         min-zoom="2"
+                         tilt="45">
+                    </map>
+                  </div>
                 </div>
               </li>
             </ul>
