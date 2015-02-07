@@ -126,6 +126,60 @@ h1{
 }
 
 /**************************/
+/********** EVENT **********/
+/**************************/
+.ficheEvent {
+  background-color: white;
+}
+.barHeader {
+  color : white;
+  background-color: $black;
+  border-top: 2px solid white;
+  padding : 10px 0;
+  text-align: center;
+  h1{
+    width: 70%;
+    padding-top: 7px;
+    float: left;
+    font-family: Arial;
+  }
+  span  {
+    width : 30%;
+    padding-top: 7px;
+    float: left;
+    font-size : 1.5em;
+  }
+}
+
+.dateEvent {
+  text-align: center;
+  font-size: 1.3em;
+  padding : 10px;
+  background-color: #d3d3d3;
+  border-bottom: 1px solid darkgrey;
+}
+
+.compteurEvent {
+
+  text-align: center;
+  font-size: 1.3em;
+  padding : 20px;
+  background-color: #d3d3d3;
+  p {
+    margin-bottom: 0;
+  }
+}
+
+.participants, .friends {
+  h2 {
+    text-transform: uppercase;
+    color : $darkblue;
+    text-align: center;
+    margin: 20px 0;
+  }
+}
+
+/**************************/
 /********** EVENTS **********/
 /**************************/
 
@@ -166,6 +220,8 @@ h1{
 
     .infosEvent {
       padding: 10px;
+      display: block;
+      color : white!important;
       div {
         float: left;
         text-align: center;

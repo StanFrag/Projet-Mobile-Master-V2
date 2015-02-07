@@ -1,0 +1,41 @@
+<ion-view title="evenements">
+    <ion-content class="has-header ficheEvent" scroll="false">
+        <ion-view title="ficheEvent">
+            <ion-content class="" scroll="true">
+                <div class="barHeader">
+                    <h1>{{e.event.title}}</h1>
+                    <span>{{ e.participants.length }} / {{ e.event.max_players }}</span>
+                    <div class="clear"></div>
+                </div>
+                <div class="dateEvent">
+                    {{ e.event.created | date:'dd-MM-yyyy'}} {{ e.event.created | date:'HH:mm'}}
+                </div>
+                <div class="compteurEvent">
+                    <h3>17h : 21m : 30s</h3>
+                    <p>avant la traque</p>
+                </div>
+                <div class="participants">
+                    <h2>Particiants</h2>
+                    <ul>
+                        <li ng-repeat="p in e.participants">
+                            {{ p }}
+                            {{ p.user }}
+                        </li>
+                    </ul>
+                </div>
+                <div class="friends">
+                    <h2>Dont vos amis ...</h2>
+
+                </div>
+            </ion-content>
+        </ion-view>
+        <div class="tabs">
+            <a class="tab-item">
+                Participer
+            </a>
+            <a class="tab-item">
+                Localiser
+            </a>
+        </div>
+    </ion-content>
+</ion-view>

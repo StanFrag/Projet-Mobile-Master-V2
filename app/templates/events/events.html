@@ -19,7 +19,7 @@
               <div class="tabContent">
             <ul>
               <li ng-repeat="e in events" class="event">
-                <div class="infosEvent">
+                <a class="infosEvent" href="#/event/{{ e.event.id}}">
                   <div class="dateEvent">
                     {{ e.event.created | date:'dd-MM-yyyy'}} <br/>
                     {{ e.event.created | date:'HH:mm'}}
@@ -31,7 +31,7 @@
                   <div class="participantsEvent">
                     {{ e.participants.length }} / {{ e.event.max_players }}
                   </div>
-                </div>
+                </a>
                 <div class="clear"></div>
                 <div class="mapEvent">
                   <div class="containerMap">

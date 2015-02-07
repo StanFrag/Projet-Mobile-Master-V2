@@ -45,6 +45,11 @@ angular.module('Guntherandthehunters', ['ngResource', 'ionic', 'config', 'Gunthe
       templateUrl: 'templates/map/map.html'
     })
 
+      .state('core.event', {
+        url: "/event/:id",
+        controller : 'EventCtrl',
+        templateUrl: 'templates/events/event.html'
+      })
     .state('core.events', {
       url: "/events",
       controller : 'EventsCtrl',

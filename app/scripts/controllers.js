@@ -494,6 +494,15 @@ app.controller('ChatCtrl', function ($scope) {
 	}
 })
 
+app.controller('EventCtrl', function ($scope, User, Event, $stateParams) {
+	var eventId = $stateParams.id;
+	$scope.e = {}
+	Event.user.get({eventId:eventId}).$promise.then(function(data) {
+		console.log(data);
+		$scope.e = data.event;
+	});
+});
+
 app.controller('EventsCtrl', function ($scope, User, Event, $ionicLoading, AlertService, $http, $q) {
 
 	//Initialisation du tableau d'événements
