@@ -107,6 +107,11 @@ angular.module('Guntherandthehunters.services', [])
                     method: 'DELETE'
                 }
             }),
+            participate : $resource(ENV.apiEndpoint + 'api/participate', {id : '@id'}, {
+                'get' : {
+                    method: 'GET'
+                }
+            }),
             getOptions : function () {
                 return options;
             }

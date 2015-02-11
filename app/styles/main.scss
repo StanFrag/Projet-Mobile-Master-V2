@@ -132,6 +132,9 @@ h1{
   background-color: white;
 
   .tabs {
+    .isParticiped {
+      color : $green;
+    }
     a {
       text-transform: uppercase;
       color : white;

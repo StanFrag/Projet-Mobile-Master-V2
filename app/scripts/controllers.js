@@ -71,7 +71,7 @@ app.controller('ConfigCtrl', function($scope, $state, $rootScope, $http) {
 /******* GENERAL ********/
 /***********************/
 
-app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPlatform,$timeout, $http, SOCKET_URL, CURRENTUSER, $ionicSideMenuDelegate) {
+app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPlatform,$timeout, $http, SOCKET_URL, CURRENTUSER, $ionicSideMenuDelegate, $stateParams, Event, AlertService) {
 	//On empêche le drag menu sur cette page
 	$ionicSideMenuDelegate.canDragContent(false);
 	
@@ -123,6 +123,36 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPla
 
 			// On initialise la position et le marker du player utilisant l'application
 			$scope.initiatePlayer()
+
+			/*******   LOCALISE AN EVENT  *******/
+			var eventId = $stateParams.eventId;
+			if(eventId) {
+				Event.user.get({eventId : eventId}).$promise.then(function(event) {
+					if(event.success) {
+						$scope.event = event.event;
+						var pos = new google.maps.LatLng(event.event.coords.posX, event.event.coords.posY);
+						console.log($scope.map)
+						$scope.map.setCenter(pos);
+						var eventOptions = {
+							strokeColor: '#A2C539',
+							strokeOpacity: 0.4,
+							strokeWeight: 2,
+							fillColor: '#A2C539',
+							fillOpacity: 0.35,
+							map: $scope.map,
+							center: pos,
+							radius: $scope.event.event.distance,
+							editable : false,
+							draggable : false
+						};
+						$scope.perimeter =  new google.maps.Circle(eventOptions);
+					} else {
+						AlertService.add('error', 'Attention !', event.error);
+						//error
+					}
+				});
+			}
+
 	    });
 	});
 
@@ -151,8 +181,10 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPla
 				// On rerajoute le joueur a sa nouvelle position
 				$scope.addMainPlayer(position.coords.latitude,position.coords.longitude);
 
-				// On centre la map sur la position du player principal
-				$scope.map.setCenter(pos);
+				if(!$scope.event) {
+					// On centre la map sur la position du player principal
+					$scope.map.setCenter(pos);
+				}
 
 				// On push ces positions dans le tableau de position
 				$scope.positionsPlayer.push({lat: pos.k,lng: pos.B});
@@ -286,7 +318,9 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPla
 				easing: 'linear', 
 				duration: 3000,
 				complete: function(){
-					$scope.map.setCenter(pos);
+					if(!$scope.event) {
+						$scope.map.setCenter(pos);
+					}
 					$ionicLoading.hide();
 				}
             });
@@ -494,7 +528,68 @@ app.controller('ChatCtrl', function ($scope) {
 	}
 })
 
-app.controller('EventCtrl', function ($scope, User, Event, $stateParams) {
+
+app.controller('ParticipateCtrl', function ($scope, User, Event, $stateParams, AlertService, $q, $location) {
+	$scope.getStorageToken = function(){
+		var deferred = $q.defer();
+		deferred.resolve(localStorage.getItem('token'));
+		return deferred.promise;
+	}
+
+	var tokenTmp = $scope.getStorageToken();
+
+	tokenTmp.then(function(token){
+		$scope.verifToken(token);
+	}, function(err){
+		AlertService.add('error', 'Error !', 'Veuillez contacter le support du jeu.');
+		$scope.goToState('auth.login');
+	})
+
+	$scope.verifToken = function(token){
+
+		if(token == "undefined"){
+			AlertService.add('error', 'Attention !', 'Veuillez vous identifier avant d\'acceder au jeu');
+			$scope.goToState('auth.login');
+		}else{
+
+			var tempUser = User.isLoggedIn.isLoggedIn({access_token : token});
+			tempUser.$promise.then(function(result) {
+				if(result){
+					if(!result.isLoggedIn){
+						AlertService.add('error', 'Attention !', 'Veuillez vous identifier avant d\'acceder au jeu');
+						$scope.goToState('auth.login');
+					}else{
+						$scope.user = result.user;
+						$scope.initialize();
+
+					}
+				}else{
+					AlertService.add('error', 'Attention !', 'Problème au sein du serveur Gunther, veuillez contacter un administrateur!');
+					$scope.goToState('auth.login');
+				}
+			});
+		}
+	}
+
+	$scope.initialize = function() {
+		var eventId = $stateParams.eventId;
+		Event.participate.get({eventId : eventId, userId : $scope.user.user.id}).$promise.then(function(result) {
+			if(result.success) {
+				AlertService.add('succes', result.message);
+				$location.path('/event/' + eventId);
+
+			} else {
+				AlertService.add('error', 'Attention !', result.error);
+				$location.path('/event/' + eventId);
+
+			}
+		})
+
+	}
+
+});
+
+app.controller('EventCtrl', function ($scope, User, Event, $stateParams, $q) {
 
 
 	$scope.compte_a_rebours = function()
@@ -583,29 +678,76 @@ app.controller('EventCtrl', function ($scope, User, Event, $stateParams) {
 
 		var actualisation = setTimeout(function(){ $scope.compte_a_rebours(); }, 1000);
 	}
+	$scope.initialize = function() {
+		var eventId = $stateParams.id;
+		$scope.e = {}
+		Event.user.get({eventId:eventId}).$promise.then(function(data) {
+			$scope.e = data.event;
+			for(var p = data.event.participants.length -1; p >= 0; p-- ) {
+				var getLevel = function(p) {
+					//Récupération du level de l'utilisateur via l'api
+					User.getLevelUser(data.event.participants[p].user).then(function(result) {
+						$scope.isParticiped = false;
+						console.log($scope.user.id)
+						if(data.event.participants[p].user.id == $scope.user.user.id) {
+							$scope.isParticiped = true;
+						}
+						//récupération du level en cours
+						data.event.participants[p].user.level = result.level;
+						//Récupération du niveau suivant
+						data.event.participants[p].user.nextLevel = result.nextLevel;
+						//Calcul du pourcentage avant le niveau suivant
+						data.event.participants[p].user.pourc =  ((data.event.participants[p].user.exp - data.event.participants[p].user.level.begin)/ (data.event.participants[p].user.nextLevel.begin - data.event.participants[p].user.level.begin)) * 100;
 
-	var eventId = $stateParams.id;
-	$scope.e = {}
-	Event.user.get({eventId:eventId}).$promise.then(function(data) {
-		$scope.e = data.event;
-		for(var p = data.event.participants.length -1; p >= 0; p-- ) {
-			var getLevel = function(p) {
-				//Récupération du level de l'utilisateur via l'api
-				User.getLevelUser(data.event.participants[p].user).then(function(result) {
-					//récupération du level en cours
-					data.event.participants[p].user.level = result.level;
-					//Récupération du niveau suivant
-					data.event.participants[p].user.nextLevel = result.nextLevel;
-					//Calcul du pourcentage avant le niveau suivant
-					data.event.participants[p].user.pourc =  ((data.event.participants[p].user.exp - data.event.participants[p].user.level.begin)/ (data.event.participants[p].user.nextLevel.begin - data.event.participants[p].user.level.begin)) * 100;
+					});
+				}(p);
 
-				});
-			}(p);
+			}
 
+			$scope.compte_a_rebours();
+		});
+	}
+	$scope.getStorageToken = function(){
+		var deferred = $q.defer();
+		deferred.resolve(localStorage.getItem('token'));
+		return deferred.promise;
+	}
+
+	var tokenTmp = $scope.getStorageToken();
+
+	tokenTmp.then(function(token){
+		$scope.verifToken(token);
+	}, function(err){
+		AlertService.add('error', 'Error !', 'Veuillez contacter le support du jeu.');
+		$scope.goToState('auth.login');
+	})
+
+	$scope.verifToken = function(token){
+
+		if(token == "undefined"){
+			AlertService.add('error', 'Attention !', 'Veuillez vous identifier avant d\'acceder au jeu');
+			$scope.goToState('auth.login');
+		}else{
+
+			var tempUser = User.isLoggedIn.isLoggedIn({access_token : token});
+			tempUser.$promise.then(function(result) {
+				if(result){
+					if(!result.isLoggedIn){
+						AlertService.add('error', 'Attention !', 'Veuillez vous identifier avant d\'acceder au jeu');
+						$scope.goToState('auth.login');
+					}else{
+						$scope.user = result.user;
+						$scope.initialize();
+
+					}
+				}else{
+					AlertService.add('error', 'Attention !', 'Problème au sein du serveur Gunther, veuillez contacter un administrateur!');
+					$scope.goToState('auth.login');
+				}
+			});
 		}
+	}
 
-		$scope.compte_a_rebours();
-	});
 });
 
 app.controller('EventsCtrl', function ($scope, User, Event, $ionicLoading, AlertService, $http, $q) {
