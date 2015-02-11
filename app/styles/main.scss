@@ -130,6 +130,13 @@ h1{
 /**************************/
 .ficheEvent {
   background-color: white;
+
+  .tabs {
+    a {
+      text-transform: uppercase;
+      color : white;
+    }
+  }
 }
 .barHeader {
   color : white;
@@ -176,6 +183,28 @@ h1{
     color : $darkblue;
     text-align: center;
     margin: 20px 0;
+  }
+}
+
+.participants {
+  ul {
+    padding : 0 10px ;
+    li {
+      float: left;
+      width: 25%;
+      height: 25%;
+      .participant {
+        svg {
+          width: 100%;
+          height: 100%;
+        }
+        h3 {
+          font-size: 1em!important;
+          text-align: center;
+          margin-top: 0;
+        }
+      }
+    }
   }
 }
 
@@ -229,6 +258,10 @@ h1{
       }
       .dateEvent {
         width: 20%;
+        background : none;
+        font-size: 0.8em;
+        border-bottom: none;
+        padding: 0;
       }
       .participantsEvent {
         width: 20%;

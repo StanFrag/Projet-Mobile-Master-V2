@@ -1,7 +1,7 @@
 'use strict';
 angular.module('Guntherandthehunters.services', [])
 
-.factory('User', function($resource, ENV) {
+.factory('User', function($resource, ENV, $q, $http) {
   return {
     forgot : $resource(ENV.apiEndpoint + 'api/forgot', {email: '@email' }, {
         'resetPassword': {
@@ -32,7 +32,32 @@ angular.module('Guntherandthehunters.services', [])
       'logout': {
         method: 'GET' 
       }
-    })
+    }),
+      getLevelUser : function(u) {
+          var deferred = $q.defer();
+          $http.get(ENV.apiEndpoint + '/json/levels.json').success(function(data){
+              var exp = u.exp;
+              var level = {};
+              var ended = false;
+              for(var i = data.length-1; i >= 0; i--) {
+                  if(exp >= data[i].begin && !ended) {
+                      ended = true;
+                      level = data[i];
+                      if(i < data.length-1){
+                          var nextLevel = data[i+1];
+                          deferred.resolve({"level" :level, "nextLevel" : nextLevel});
+                      }else {
+                          $http.get('/api/getMaxExp').success(function(data) {
+                              var nextLevel = data.max;
+                              deferred.resolve({"level" :level, "nextLevel" : nextLevel});
+                          });
+                      }
+                  }
+              }
+          });
+          return deferred.promise;
+
+      }
   }
 
 })

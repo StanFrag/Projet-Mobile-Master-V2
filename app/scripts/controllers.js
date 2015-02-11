@@ -495,11 +495,116 @@ app.controller('ChatCtrl', function ($scope) {
 })
 
 app.controller('EventCtrl', function ($scope, User, Event, $stateParams) {
+
+
+	$scope.compte_a_rebours = function()
+	{
+		var date_evenement = new Date($scope.e.event.created);
+		var compte_a_rebours = document.getElementById("compte_a_rebours");
+
+		var date_actuelle = new Date();
+		//var date_evenement = new Date("Jan 1 00:00:00 2013");
+		var total_secondes = (date_evenement - date_actuelle) / 1000;
+
+		var prefixe = "";
+		if (total_secondes < 0)
+		{
+			prefixe = ""; // On modifie le préfixe si la différence est négatif
+
+			total_secondes = Math.abs(total_secondes); // On ne garde que la valeur absolue
+
+		}
+
+		if (total_secondes > 0)
+		{
+			var jours = Math.floor(total_secondes / (60 * 60 * 24));
+			var heures = Math.floor((total_secondes - (jours * 60 * 60 * 24)) / (60 * 60));
+			var minutes = Math.floor((total_secondes - ((jours * 60 * 60 * 24 + heures * 60 * 60))) / 60);
+			var secondes = Math.floor(total_secondes - ((jours * 60 * 60 * 24 + heures * 60 * 60 + minutes * 60)));
+
+			var et = "et";
+			var mot_jour = "j";
+			var mot_heure = "h";
+			var mot_minute = "m";
+			var mot_seconde = "s";
+
+			if (jours == 0)
+			{
+				jours = '';
+				mot_jour = '';
+			}
+			else if (jours == 1)
+			{
+				mot_jour = "j";
+			}
+
+			if (heures == 0)
+			{
+				heures = '';
+				mot_heure = '';
+			}
+			else if (heures == 1)
+			{
+				mot_heure = "h";
+			}
+
+			if (minutes == 0)
+			{
+				minutes = '';
+				mot_minute = '';
+			}
+			else if (minutes == 1)
+			{
+				mot_minute = "m";
+			}
+
+			if (secondes == 0)
+			{
+				secondes = '';
+				mot_seconde = '';
+				et = '';
+			}
+			else if (secondes == 1)
+			{
+				mot_seconde = "s";
+			}
+
+			if (minutes == 0 && heures == 0 && jours == 0)
+			{
+				et = "";
+			}
+
+			compte_a_rebours.innerHTML = prefixe + jours + ' ' + mot_jour + ' ' + heures + ' ' + mot_heure + ' ' + minutes + ' ' + mot_minute + ' ' + et + ' ' + secondes + ' ' + mot_seconde;
+		}
+		else
+		{
+			compte_a_rebours.innerHTML = 'Événement terminé.';
+		}
+
+		var actualisation = setTimeout(function(){ $scope.compte_a_rebours(); }, 1000);
+	}
+
 	var eventId = $stateParams.id;
 	$scope.e = {}
 	Event.user.get({eventId:eventId}).$promise.then(function(data) {
-		console.log(data);
 		$scope.e = data.event;
+		for(var p = data.event.participants.length -1; p >= 0; p-- ) {
+			var getLevel = function(p) {
+				//Récupération du level de l'utilisateur via l'api
+				User.getLevelUser(data.event.participants[p].user).then(function(result) {
+					//récupération du level en cours
+					data.event.participants[p].user.level = result.level;
+					//Récupération du niveau suivant
+					data.event.participants[p].user.nextLevel = result.nextLevel;
+					//Calcul du pourcentage avant le niveau suivant
+					data.event.participants[p].user.pourc =  ((data.event.participants[p].user.exp - data.event.participants[p].user.level.begin)/ (data.event.participants[p].user.nextLevel.begin - data.event.participants[p].user.level.begin)) * 100;
+
+				});
+			}(p);
+
+		}
+
+		$scope.compte_a_rebours();
 	});
 });
 
