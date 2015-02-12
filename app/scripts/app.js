@@ -6,7 +6,7 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-angular.module('Guntherandthehunters', ['ngResource', 'ionic', 'config', 'Guntherandthehunters.controllers', 'Guntherandthehunters.services'])
+angular.module('Guntherandthehunters', ['ngResource', 'ionic', 'config', 'Guntherandthehunters.controllers', 'Guntherandthehunters.services', 'ui.bootstrap-slider', 'ui.bootstrap.datetimepicker'])
 
 .run(function($ionicPlatform, $rootScope) {
   $rootScope.messagesInfo = [];
@@ -44,10 +44,44 @@ angular.module('Guntherandthehunters', ['ngResource', 'ionic', 'config', 'Gunthe
       controller : 'MapCtrl',
       templateUrl: 'templates/map/map.html'
     })
+      .state('core.mapEvent', {
+        url: "/map/:eventId",
+        controller : 'MapCtrl',
+        templateUrl: 'templates/map/map.html'
+      })
 
+      .state('core.event', {
+        url: "/event/:id",
+        controller : 'EventCtrl',
+        templateUrl: 'templates/events/event.html'
+      })
+      .state('core.participate', {
+        url: "/participate/:eventId",
+        controller : 'ParticipateCtrl'
+      })
     .state('core.events', {
       url: "/events",
       controller : 'EventsCtrl',
+      templateUrl: 'templates/events/events.html'
+    })
+      .state('core.myEvent', {
+        url: "/myEvents/:userId",
+        controller : 'EventsCtrl',
+        templateUrl: 'templates/events/events.html'
+      })
+      .state('core.addEvents', {
+        url: "/events/add",
+        controller : 'AddEventCtrl',
+        templateUrl: 'templates/events/add.html'
+      })
+      .state('core.updateEvent', {
+        url: "/events/add/:id",
+        controller : 'AddEventCtrl',
+        templateUrl: 'templates/events/add.html'
+      })
+    .state('core.profil', {
+      url: "/profil",
+      controller : 'ProfilCtrl',
       templateUrl: 'templates/events/events.html'
     })
 
@@ -71,6 +105,11 @@ angular.module('Guntherandthehunters', ['ngResource', 'ionic', 'config', 'Gunthe
 
     .state('core.rank', {
       url: "/rank",
+      controller : 'RankCtrl',
+      templateUrl: 'templates/rank/rank.html'
+    })
+    .state('core.rankFriend', {
+      url: "/rankFriend/:userId",
       controller : 'RankCtrl',
       templateUrl: 'templates/rank/rank.html'
     })

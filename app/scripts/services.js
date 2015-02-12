@@ -1,7 +1,7 @@
 'use strict';
 angular.module('Guntherandthehunters.services', [])
 
-.factory('User', function($resource, ENV) {
+.factory('User', function($resource, ENV, $q, $http) {
   return {
     forgot : $resource(ENV.apiEndpoint + 'api/forgot', {email: '@email' }, {
         'resetPassword': {
@@ -32,11 +32,94 @@ angular.module('Guntherandthehunters.services', [])
       'logout': {
         method: 'GET' 
       }
-    })
+    }),
+      getRanking : function(friends, limit, offset) {
+        return $http.get(ENV.apiEndpoint + 'api/ranking?friends='+friends+'&limit='+ limit + '&offset=' + offset);
+      },
+      getLevelUser : function(u) {
+          var deferred = $q.defer();
+          $http.get(ENV.apiEndpoint + '/json/levels.json').success(function(data){
+              var exp = u.exp;
+              var level = {};
+              var ended = false;
+              for(var i = data.length-1; i >= 0; i--) {
+                  if(exp >= data[i].begin && !ended) {
+                      ended = true;
+                      level = data[i];
+                      if(i < data.length-1){
+                          var nextLevel = data[i+1];
+                          deferred.resolve({"level" :level, "nextLevel" : nextLevel});
+                      }else {
+                          $http.get('/api/getMaxExp').success(function(data) {
+                              var nextLevel = data.max;
+                              deferred.resolve({"level" :level, "nextLevel" : nextLevel});
+                          });
+                      }
+                  }
+              }
+          });
+          return deferred.promise;
+
+      }
   }
 
 })
 
+.factory('Event',function($resource, ENV) {
+        var options = {
+            minPerimeter : 500,
+            maxPerimeter : 2000,
+            minDuration : 10,
+            maxDuration : 90,
+            minPlayers : 5,
+            maxPlayers : 100,
+            minDifficulty : 1,
+            maxDifficulty : 10
+        }
+        var event = {}
+        var events = {}
+        return {
+            admin : $resource(ENV.apiEndpoint + 'rest/events', {}, {
+                'get': {
+                    method: 'GET'
+                },
+                'create': {
+                    method: 'POST'
+                },
+                'update': {
+                    method: 'PUT'
+                },
+                'delete': {
+                    method: 'DELETE'
+                }
+            }),
+            user : $resource(ENV.apiEndpoint + 'api/events', {id : '@id'}, {
+                'getUserEvents' : {
+                    method: 'GET'
+                },
+                'get' : {
+                    method: 'GET'
+                },
+                'create' : {
+                    method: 'POST'
+                },
+                'update' : {
+                    method: 'PUT'
+                },
+                'delete' : {
+                    method: 'DELETE'
+                }
+            }),
+            participate : $resource(ENV.apiEndpoint + 'api/participate', {id : '@id'}, {
+                'get' : {
+                    method: 'GET'
+                }
+            }),
+            getOptions : function () {
+                return options;
+            }
+        }
+})
 .factory('AlertService', ['$timeout', '$rootScope',
     function($timeout, $rootScope) {
 

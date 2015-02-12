@@ -56,7 +56,9 @@ app.controller('ConfigCtrl', function($scope, $state, $rootScope, $http) {
 /******* GENERAL ********/
 /***********************/
 
-app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPopup, $ionicPlatform, $timeout, $http, $q, AlertService, SOCKET_URL, CURRENTUSER, User) {
+app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPopup, $ionicPlatform, $timeout,  $http, $q, User, SOCKET_URL, CURRENTUSER, $ionicSideMenuDelegate, $stateParams, Event, AlertService) {
+	//On empêche le drag menu sur cette page
+	$ionicSideMenuDelegate.canDragContent(false);
 
 	var socket;
 	var distanceDuel = 100; // Calculé en mètre
@@ -91,7 +93,6 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPop
 		tokenTmp.then(function(token){
 	    	$scope.verifToken(token, map);
 	    }, function(err){
-	    	console.log("error dans le getStorageToken");
 	    	AlertService.add('error', 'Error !', 'Veuillez contacter le support du jeu.');
 			$scope.goToState('auth.login');
 	    })
@@ -166,7 +167,7 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPop
 											var verifProximity = $scope.ennemyIsProxim(tmpPlayer,tmpEnnemy);
 											verifProximity.then(function(result){
 												if(result){
-													console.log("youhou un duel possible");
+													console.log("Duel");
 													$scope.addPopDuel();
 												}else{
 													console.log("pas de duel");
@@ -202,7 +203,7 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPop
 													var verifProximity = $scope.ennemyIsProxim(tmpPlayer,tmpEnnemy);
 													verifProximity.then(function(result){
 														if(result){
-															console.log("youhou un duel possible");
+															console.log("Duel");
 															$scope.addPopDuel();
 														}else{
 															console.log("pas de duel");
@@ -231,7 +232,7 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPop
 											verifProximity.then(function(result){
 												if(result){
 													$scope.addPopDuel();
-													console.log("youhou un duel possible");
+													console.log("duel");
 												}else{
 													console.log("pas de duel");
 												}
@@ -278,8 +279,34 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPop
 			} else {
 				this.setAnimation(google.maps.Animation.BOUNCE);
 			}
-	    }    
+	    }
 
+		/*******   LOCALISE AN EVENT  *******/
+		var eventId = $stateParams.eventId;
+		if(eventId) {
+			Event.user.get({eventId : eventId}).$promise.then(function(event) {
+				if(event.success) {
+					$scope.event = event.event;
+					var pos = new google.maps.LatLng(event.event.coords.posX, event.event.coords.posY);
+					$scope.map.setCenter(pos);
+					var eventOptions = {
+						strokeColor: '#A2C539',
+						strokeOpacity: 0.4,
+						strokeWeight: 2,
+						fillColor: '#A2C539',
+						fillOpacity: 0.35,
+						map: $scope.map,
+						center: pos,
+						radius: $scope.event.event.distance,
+						editable : false,
+						draggable : false
+					};
+					$scope.perimeter =  new google.maps.Circle(eventOptions);
+				} else {
+					AlertService.add('error', 'Attention !', event.error);
+				}
+			});
+		}
 	    // Calcul de la proximité entre deux utilisateurs
 	    $scope.ennemyIsProxim = function(obj1,obj2){
 	    	var deferred = $q.defer(); 
@@ -297,8 +324,6 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPop
 
 			var d = R * c;
 
-			console.log(d);
-			console.log("La distance en m calculé entre les deux objs: ",d)
 
 			// Si la distance est inferieux à la distance maximum de duel, return true
 			if(d < distanceDuel){
@@ -313,12 +338,11 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPop
 	    $scope.toRadians = function (angle) {
 		  return angle * (Math.PI / 180);
 		}
-
 		// Centrer la map et le joueur sur la position géolocalisé
 		$scope.initiatePlayer= function(){
 			// On affiche la barre de chargement
 			$ionicLoading.show({
-				template: 'Loading...'
+				template: 'Chargement...'
 			});
 
 			// Une fois que la plateforme ionic est prete
@@ -335,7 +359,6 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPop
 					};
 
 					socket.emit('newUser', posPlayer);
-
 					// On rerajoute le joueur a sa nouvelle position
 					$scope.markers.push($scope.addMarker({lat:position.coords.latitude,lng:position.coords.longitude}, CURRENTUSER.id, "player"));
 
@@ -513,29 +536,715 @@ app.controller('ChatCtrl', function ($scope) {
 	}
 })
 
-app.controller('EventsCtrl', function ($scope) {
+
+app.controller('ParticipateCtrl', function ($scope, User, Event, $stateParams, AlertService, $q, $location) {
+	$scope.getStorageToken = function(){
+		var deferred = $q.defer();
+		deferred.resolve(localStorage.getItem('token'));
+		return deferred.promise;
+	}
+
+	var tokenTmp = $scope.getStorageToken();
+
+	tokenTmp.then(function(token){
+		$scope.verifToken(token);
+	}, function(err){
+		AlertService.add('error', 'Error !', 'Veuillez contacter le support du jeu.');
+		$scope.goToState('auth.login');
+	})
+
+	$scope.verifToken = function(token){
+
+		if(token == "undefined"){
+			AlertService.add('error', 'Attention !', 'Veuillez vous identifier avant d\'acceder au jeu');
+			$scope.goToState('auth.login');
+		}else{
+
+			var tempUser = User.isLoggedIn.isLoggedIn({access_token : token});
+			tempUser.$promise.then(function(result) {
+				if(result){
+					if(!result.isLoggedIn){
+						AlertService.add('error', 'Attention !', 'Veuillez vous identifier avant d\'acceder au jeu');
+						$scope.goToState('auth.login');
+					}else{
+						$scope.user = result.user;
+						$scope.initialize();
+
+					}
+				}else{
+					AlertService.add('error', 'Attention !', 'Problème au sein du serveur Gunther, veuillez contacter un administrateur!');
+					$scope.goToState('auth.login');
+				}
+			});
+		}
+	}
+
+	$scope.initialize = function() {
+		var eventId = $stateParams.eventId;
+		Event.participate.get({eventId : eventId, userId : $scope.user.user.id}).$promise.then(function(result) {
+			if(result.success) {
+				AlertService.add('succes', result.message);
+				$location.path('/event/' + eventId);
+
+			} else {
+				AlertService.add('error', 'Attention !', result.error);
+				$location.path('/event/' + eventId);
+
+			}
+		})
+
+	}
+
+});
+
+app.controller('EventCtrl', function ($scope, User, Event, $stateParams, $q) {
+
+	$scope.actualisation;
+	$scope.compte_a_rebours = function()
+	{
+		var date_evenement = new Date($scope.e.event.created);
+		var compte_a_rebours = document.getElementById("compte_a_rebours");
+
+		var date_actuelle = new Date();
+		//var date_evenement = new Date("Jan 1 00:00:00 2013");
+		var total_secondes = (date_evenement - date_actuelle) / 1000;
+
+		var prefixe = "";
+		if (total_secondes < 0)
+		{
+			prefixe = ""; // On modifie le préfixe si la différence est négatif
+
+			total_secondes = Math.abs(total_secondes); // On ne garde que la valeur absolue
+
+		}
+
+		if (total_secondes > 0)
+		{
+			var jours = Math.floor(total_secondes / (60 * 60 * 24));
+			var heures = Math.floor((total_secondes - (jours * 60 * 60 * 24)) / (60 * 60));
+			var minutes = Math.floor((total_secondes - ((jours * 60 * 60 * 24 + heures * 60 * 60))) / 60);
+			var secondes = Math.floor(total_secondes - ((jours * 60 * 60 * 24 + heures * 60 * 60 + minutes * 60)));
+
+			var et = "et";
+			var mot_jour = "j";
+			var mot_heure = "h";
+			var mot_minute = "m";
+			var mot_seconde = "s";
+
+			if (jours == 0)
+			{
+				jours = '';
+				mot_jour = '';
+			}
+			else if (jours == 1)
+			{
+				mot_jour = "j";
+			}
+
+			if (heures == 0)
+			{
+				heures = '';
+				mot_heure = '';
+			}
+			else if (heures == 1)
+			{
+				mot_heure = "h";
+			}
+
+			if (minutes == 0)
+			{
+				minutes = '';
+				mot_minute = '';
+			}
+			else if (minutes == 1)
+			{
+				mot_minute = "m";
+			}
+
+			if (secondes == 0)
+			{
+				secondes = '';
+				mot_seconde = '';
+				et = '';
+			}
+			else if (secondes == 1)
+			{
+				mot_seconde = "s";
+			}
+
+			if (minutes == 0 && heures == 0 && jours == 0)
+			{
+				et = "";
+			}
+
+			compte_a_rebours.innerHTML = prefixe + jours + ' ' + mot_jour + ' ' + heures + ' ' + mot_heure + ' ' + minutes + ' ' + mot_minute + ' ' + et + ' ' + secondes + ' ' + mot_seconde;
+		}
+		else
+		{
+			compte_a_rebours.innerHTML = 'Événement terminé.';
+		}
+
+		$scope.actualisation = setTimeout(function(){ $scope.compte_a_rebours(); }, 1000);
+	}
+	$scope.initialize = function() {
+		var eventId = $stateParams.id;
+		$scope.e = {}
+		Event.user.get({eventId:eventId}).$promise.then(function(data) {
+			$scope.e = data.event;
+			for(var p = data.event.participants.length -1; p >= 0; p-- ) {
+				var getLevel = function(p) {
+					//Récupération du level de l'utilisateur via l'api
+					User.getLevelUser(data.event.participants[p].user).then(function (result) {
+						$scope.isParticiped = false;
+						data.event.participants[p].user.level = result.level;
+						if (data.event.participants[p].user.id == $scope.user.user.id) {
+							$scope.isParticiped = true;
+						}
+					});
+				}(p)
+			}
+
+			$scope.compte_a_rebours();
+		});
+	}
+	$scope.$on('$destroy', function(){
+		clearTimeout($scope.actualisation);
+	});
+	$scope.getStorageToken = function(){
+		var deferred = $q.defer();
+		deferred.resolve(localStorage.getItem('token'));
+		return deferred.promise;
+	}
+
+	var tokenTmp = $scope.getStorageToken();
+
+	tokenTmp.then(function(token){
+		$scope.verifToken(token);
+	}, function(err){
+		AlertService.add('error', 'Error !', 'Veuillez contacter le support du jeu.');
+		$scope.goToState('auth.login');
+	})
+
+	$scope.verifToken = function(token){
+
+		if(token == "undefined"){
+			AlertService.add('error', 'Attention !', 'Veuillez vous identifier avant d\'acceder au jeu');
+			$scope.goToState('auth.login');
+		}else{
+
+			var tempUser = User.isLoggedIn.isLoggedIn({access_token : token});
+			tempUser.$promise.then(function(result) {
+				if(result){
+					if(!result.isLoggedIn){
+						AlertService.add('error', 'Attention !', 'Veuillez vous identifier avant d\'acceder au jeu');
+						$scope.goToState('auth.login');
+					}else{
+						$scope.user = result.user;
+						$scope.initialize();
+
+					}
+				}else{
+					AlertService.add('error', 'Attention !', 'Problème au sein du serveur Gunther, veuillez contacter un administrateur!');
+					$scope.goToState('auth.login');
+				}
+			});
+		}
+	}
+
+});
+
+app.controller('EventsCtrl', function ($scope, User, Event, $ionicLoading, AlertService, $http, $q, $stateParams) {
+
+	var userId = $stateParams.userId;
+
+	if(userId) {
+		$scope.myEvent = true;
+	} else {
+		$scope.myEvent = false;
+	}
+
 	//Initialisation du tableau d'événements
 	$scope.events = [];
 	//Initialisation du tableau de filtres
 	$scope.filters = {
 		limit : 10,
 		offset : 0,
-		filter : ''
+		filter : '',
+		hisEvents : 0
 	};
 
 	//Vue d'affichage des filtres d'affichage des events
 	$scope.openFilter = function() {
 
 	}
-	//Fonction de récupération des événements
-	$scope.getEvents = function(limit, offset, filter) {
 
+	$scope.$on('mapInitialized', function(event, map) {
+
+		//Récuperation du style de map en json
+		$http.get('../json/mapStyle.json').success(function(data){
+			// Création du style de la map
+			var roadGuntherStyles = data;
+			var styledMapOptions = {name: 'FR Gunther style'};
+			var frMapGuntherStyle = new google.maps.StyledMapType(roadGuntherStyles, styledMapOptions);
+
+			// Ajout du style de la map
+			map.mapTypes.set('frguntherstyle', frMapGuntherStyle);
+			map.setMapTypeId('frguntherstyle');
+
+			// Ajout de la map
+			$scope.map = map;
+		});
+	});
+
+	//Fonction de récupération des événements
+	$scope.getEvents = function(limit, offset, filter, hisEvents) {
+
+		if($scope.myEvent) {
+
+			var id = $scope.user.user.id;
+			var promiseEvents = Event.user.getUserEvents({id : id, limit : limit, offset : offset, filter : filter});
+		} else {
+			var promiseEvents = Event.user.get({limit : limit, offset : offset, filter : filter});
+
+		}
+		promiseEvents.$promise.then(function(data) {
+			if(data.success) {
+				var deferred = $q.defer();
+				var promises = [];
+				var url="https://maps.googleapis.com/maps/api/place/nearbysearch/json?KEY=AIzaSyDjtiAbO0DsvPNTWhWW0draH_L8fnOvEic";
+				var getAddresses = function(events) {
+
+					for(var i = events.length-1 ; i >= 0; i--) {
+						var promise = function(event) {
+							var defer2 = $q.defer();
+							var geocoder = new google.maps.Geocoder();
+							var location = new google.maps.LatLng(event.coords.posX, event.coords.posY);
+							geocoder.geocode( { 'location': location}, function(results, status) {
+								if (status == google.maps.GeocoderStatus.OK) {
+									event.coords.address = results[2].formatted_address;
+									deferred.resolve(event);
+
+								} else {
+									console.log("Geocode was not successful for the following reason: " + status);
+								}
+							});
+							return defer2.promise;
+						}(events[i])
+
+						//On ajoute la promesse dans le tableau
+						promises.push(promise);
+					}
+					return deferred.promise;
+				} (data.events);
+
+				//Une fois que toutes les promesses sont résolues
+				$q.all(promises).then(function(result) {
+					//On résout la promesse N1
+					deferred.resolve(result);
+				} , function (reason) {
+					//On affiche l'erreur en console (DEV MOD)
+					console.error(reason);
+				})
+
+				getAddresses.then(function(events) {
+					//On ajoute les événements au tableau éxistant
+					$scope.events= $scope.events.concat(data.events);
+					$ionicLoading.hide();
+				})
+
+			} else {
+				AlertService.add('error', 'Erreur,', data.error);
+				$ionicLoading.hide();
+			}
+		}, function(error) {
+			AlertService.add('error', 'Erreur,', 'Nous n\'avons pas reussi à contacter le service, merci de réessayer plus tard.');
+			$ionicLoading.hide();
+		})
 	}
 	//Récupère plus d'événements au scroll de l'utilisateur
 	$scope.getMoreEvents = function() {
 
 	}
+	var tokenTmp = $scope.getStorageToken();
+
+	tokenTmp.then(function(token){
+		var tempUser = User.isLoggedIn.isLoggedIn({access_token : token});
+		tempUser.$promise.then(function(result) {
+			if(result){
+				if(!result.isLoggedIn){
+					AlertService.add('error', 'Attention !', 'Veuillez vous identifier avant d\'acceder au jeu');
+					$scope.goToState('auth.login');
+				}else{
+					$scope.user = result.user;
+					//Initialisation
+					$scope.initialize = function(filters) {
+						// On affiche la barre de chargement
+						$ionicLoading.show({
+							template: 'Chargement...'
+						});
+						$scope.getEvents(filters.limit, filters.offset, filters.filter, filters.hisEvents);
+					}($scope.filters);
+				}
+			}else{
+				AlertService.add('error', 'Attention !', 'Problème au sein du serveur Gunther, veuillez contacter un administrateur!');
+				$scope.goToState('auth.login');
+			}
+		});
+	}, function(err){
+		AlertService.add('error', 'Error !', 'Veuillez contacter le support du jeu.');
+		$scope.goToState('auth.login');
+	})
+
+
 })
+
+app.controller('AddEventCtrl', function(AlertService, $scope, $http, Event, User, $stateParams, $ionicSideMenuDelegate) {
+	var tokenTmp = $scope.getStorageToken();
+
+	tokenTmp.then(function(token) {
+		var tempUser = User.isLoggedIn.isLoggedIn({access_token: token});
+		tempUser.$promise.then(function (result) {
+			if(!result.isLoggedIn){
+				AlertService.add('error', 'Attention !', 'Veuillez vous identifier avant d\'acceder au jeu');
+				$scope.goToState('auth.login');
+			}else {
+				$scope.user = result.user;
+			}
+		})
+	});
+	//On empêche le drag menu sur cette page
+	$ionicSideMenuDelegate.canDragContent(false);
+	$scope.coords = "44.8376455, -0.5790386999999555";
+	/**
+	 * OPTIONS DU FORMULAIRE
+	 */
+	var options = Event.getOptions();
+	$scope.maxPerimeter = options.maxPerimeter;
+	$scope.minPerimeter = options.minPerimeter;
+	$scope.minDuration = options.minDuration;
+	$scope.maxDuration = options.maxDuration;
+	$scope.minPlayers = options.minPlayers;
+	$scope.maxPlayers = options.maxPlayers;
+	$scope.minDifficulty = options.minDifficulty;
+	$scope.maxDifficulty = options.maxDifficulty;
+
+	//Tableau de marqueurs
+	$scope.markers = [];
+	//Option du slider périmètre
+	$scope.perimeterOptions = {
+		min: $scope.minPerimeter,
+		max: $scope.maxPerimeter,
+		step: 1
+	};
+	//Option du slider sur la durée
+	$scope.durationOptions = {
+		min: $scope.minDuration,
+		max: $scope.maxDuration,
+		step: 1
+	};
+	//Option du slider du nombre de joueurs
+	$scope.playersOptions = {
+		min: $scope.minPlayers,
+		max: $scope.maxPlayers,
+		step: 1
+	};
+	//Option du slider de la difficulté
+	$scope.difficultyOptions = {
+		min: $scope.minDifficulty,
+		max: $scope.maxDifficulty,
+		step: 1
+	};
+
+	//Id de l'événement
+	var eventId = $stateParams.id;
+	//Date d'aujourd'hui pour le calendrier
+	var nowDate = new Date();
+	//On rajoute une heure pour que l'événement ne soit pas créé imédiatement
+	nowDate.setHours(nowDate.getHours()+1);
+	//On se met à l'heure fixe
+	nowDate.setMinutes(0, 0);
+	//Données des sliders du formulaire
+	$scope.sliders = {};
+	//Si on modifie un événement (id dans l'url)
+	if(eventId) {
+		//On met a true une variable pour savoir que l'on est dans une update
+		$scope.update = true;
+		//Données du formulaire
+		$scope.event = {};
+		//Récuperation depuis l'API
+		Events.user.get({eventId : eventId}).$promise.then(function(data) {
+			//
+			if(!data.success) {
+				$rootScope.errorForm =
+					data.event;
+				$rootScope.success = "";
+				$location.path('/events');
+			}
+			$scope.event = data.event.event;
+			$scope.event.dateFin = new Date($scope.event.created).toLocaleDateString() + ' ' + new Date($scope.event.created).toLocaleTimeString()
+			$scope.coords = data.event.coords.posX + ", " + data.event.coords.posY;
+			$scope.movePosition(data.event.coords.posX, data.event.coords.posY);
+			$scope.sliders.sliderValue = $scope.event.distance;
+
+			$scope.sliders.durationValue =  $scope.event.duration;
+			$scope.sliders.difficultyValue = $scope.event.difficult;
+			$scope.sliders.playersValue = [$scope.event.min_players, $scope.event.max_players];
+
+		});
+	} else {
+		$scope.update = false;
+		$scope.event = {};
+		$scope.event.created = nowDate;
+		$scope.event.dateFin = nowDate.toLocaleDateString() + ' ' + nowDate.toLocaleTimeString()
+		$scope.sliders.sliderValue = $scope.minPerimeter;
+		$scope.sliders.durationValue = $scope.minDuration;
+		$scope.sliders.playersValue = [$scope.minPlayers, ($scope.minPlayers + 5)];
+		$scope.sliders.difficultyValue = $scope.minDifficulty;
+		$scope.difficulty = "EASY";
+	}
+
+	$scope.$watch('sliders.sliderValue', function(value) {
+		$scope.enlargePerimeter(value);
+	});
+	$scope.$watch('sliders.difficultyValue', function(value) {
+		var message = "";
+		if(value > 0 && value <= 3 ) {
+			message = "EASY";
+		} else if (value <= 6) {
+			message = "MOYEN";
+		} else if (value <= 9) {
+			message = "DIFFICILE";
+
+		} else if (value == 10) {
+			message = "HARDCORE";
+		} else {
+			$scope.sliders.difficultyValue = 1;
+		}
+		$scope.difficulty = message;
+	});
+	//
+	$scope.$on('mapInitialized', function (event, map) {
+		//Récuperation du style de map en json
+		$http.get('../json/mapStyle.json').success(function(data){
+			// Création du style de la map
+			var roadGuntherStyles = data;
+			var styledMapOptions = {name: 'FR Gunther style'};
+			var frMapGuntherStyle = new google.maps.StyledMapType(roadGuntherStyles, styledMapOptions);
+			// Ajout du style de la map
+			map.mapTypes.set('frguntherstyle', frMapGuntherStyle);
+			map.setMapTypeId('frguntherstyle');
+			// Ajout de la map
+			$scope.map = map;
+			// Fonction de geolocalisation du player
+			$scope.initiatePosition();
+
+
+		});
+	});
+
+	$scope.initiatePosition = function() {
+		if(navigator) {
+			// On recherche la position actuelle de l'utilisateur
+			navigator.geolocation.getCurrentPosition(function(position) {
+				$scope.movePosition(position.coords.latitude, position.coords.longitude);
+				var marker = $scope.createMarker(position.coords.latitude, position.coords.longitude, 'eventPos');
+				$scope.addMarker(marker);
+
+			}, function(error){
+				// Si les données de géolocalisation sont inexistante ou desactivé, on previens l'utilisateur
+				alert('code: ' + error.code + '\n' + 'message: ' + error.message + '\n');
+			});
+		} else {
+			$scope.movePosition(44.8376455,-0.5790386999999555);
+			var marker = $scope.createMarker(44.8376455,-0.5790386999999555, 'eventPos');
+			$scope.addMarker(marker);
+		}
+	}
+
+	$scope.movePosition = function(x, y) {
+		// On crée une nouvelle position google map
+		var pos = new google.maps.LatLng(x, y);
+		$scope.map.setCenter(pos);
+	}
+
+
+	$scope.createMarker = function (x, y, type) {
+		var marker = {};
+		switch(type) {
+			case "eventPos" :
+				$scope.coords= x + ", " + y;
+				var eventOptions = {
+					strokeColor: '#A2C539',
+					strokeOpacity: 0.4,
+					strokeWeight: 2,
+					fillColor: '#A2C539',
+					fillOpacity: 0.35,
+					map: $scope.map,
+					center: new google.maps.LatLng(x, y),
+					radius: $scope.event.distance ? $scope.event.distance : $scope.minPerimeter,
+					editable : true,
+					draggable : true
+				};
+				$scope.perimeter =  new google.maps.Circle(eventOptions);
+				var radius_changed =  google.maps.event.addListener($scope.perimeter, 'radius_changed', function() {
+					$scope.enlargePerimeter($scope.perimeter.getRadius());
+				});
+				var center_changed =  google.maps.event.addListener($scope.perimeter, 'center_changed', function() {
+					$scope.movePerimeter($scope.perimeter);
+				});
+				break;
+			case 'bonusPos' :
+				marker = {
+					posX:x,
+					posY:y,
+					icone:
+					{
+						path: google.maps.SymbolPath.CIRCLE,
+						fillColor: '#95DE42',
+						scale: 10,
+						fillOpacity:1,
+						strokeColor:'#1D1D1D',
+						strokeOpacity:0.5,
+						strokeWeight:3
+					},
+					anim:'DROP',
+					click: ''
+				};
+				break;
+		}
+		return marker;
+
+	}
+
+	$scope.addMarker = function (marker) {
+		$scope.$apply(function() {
+			$scope.markers.push(marker);
+		});
+	}
+
+	$scope.enlargePerimeter = function(radius) {
+		if($scope.perimeter) {
+			radius = radius <= $scope.maxPerimeter ? radius : $scope.maxPerimeter;
+			radius = radius >= $scope.minPerimeter ? radius : $scope.minPerimeter;
+			$scope.event.distance = radius;
+			if(!$scope.$$phase) {
+				$scope.$apply(function() {
+					$scope.sliders.sliderValue = radius;
+				});
+			}
+			if($scope.perimeter.getRadius() != radius) {
+				$scope.perimeter.setRadius(radius);
+			}
+		}
+
+	}
+	$scope.movePerimeter = function(perimeter) {
+		$scope.map.setCenter(perimeter.getCenter());
+		$scope.$apply(function() {
+			$scope.coords= perimeter.getCenter().lat() + ", " + perimeter.getCenter().lng();
+		});
+	}
+
+
+	$scope.onTimeSet = function(nd, oldDate) {
+		var newDate = new Date(nd)
+		var nowDate = new Date();
+		var isPast = newDate.getTime() < nowDate.getTime();
+		if(isPast) {
+			$scope.event.created = nowDate;
+			nowDate.setHours(nowDate.getHours()+1);
+			nowDate.setMinutes(0, 0);
+			$scope.event.dateFin = nowDate.toLocaleDateString() + ' ' + nowDate.toLocaleTimeString()
+		} else {
+			$scope.event.created = newDate;
+			$scope.event.dateFin = newDate;
+			$scope.event.dateFin = newDate.toLocaleDateString() + ' ' + newDate.toLocaleTimeString()
+		}
+	}
+
+	$scope.updateEvent = function() {
+		var user        = User.getUser();
+		var event       = $scope.event;
+		var event       = Event.user.update({
+			user_id     :  user.id,
+			event_id    : $scope.event.id,
+			title       : $scope.event.title,
+			description : $scope.event.description,
+			minPlayers  : $scope.sliders.playersValue[0],
+			maxPlayers  : $scope.sliders.playersValue[1],
+			distance   : $scope.sliders.sliderValue,
+			duration    : $scope.sliders.durationValue,
+			difficulty  : $scope.sliders.difficultyValue,
+			lat         : $scope.coords.split(',')[0],
+			lng         : $scope.coords.split(',')[1],
+			created     : $scope.event.created
+		});
+		event.$promise.then(function (data) {
+			if (data.success === false && data.error) {
+				if (data.error) {
+					$rootScope.errorForm = data.error;
+				}
+				$rootScope.success = "";
+			} else {
+				$scope.formData = {};
+				// clear the form so our user is ready to enter another
+				$scope.
+					newsletter = data;
+
+				AlertService.add('succes', 'Félicitation !', 'La modification de l\'événement est un succès.');
+				$scope.goToState('core.events');
+			}
+		}, function (error) {
+			AlertService.add('error', 'Erreur !', 'La modification de l\'événement a echoué, merci de réessayer.');
+		});
+	}
+
+
+	$scope.create = function() {
+		var user = $scope.user.user;
+		var event = Event.user.create({
+			user_id : user.id,
+			title : $scope.event.title,
+			description : $scope.event.description,
+			minPlayers : $scope.sliders.playersValue[0],
+			maxPlayers : $scope.sliders.playersValue[1],
+			distance : $scope.sliders.sliderValue,
+			duration : $scope.sliders.durationValue,
+			difficulty : $scope.sliders.difficultyValue,
+			lat :  $scope.coords.split(',')[0],
+			lng :  $scope.coords.split(',')[1],
+			created : $scope.event.created
+		});
+		event.$promise.then(function (data) {
+			if (data.success === false && data.error) {
+				if (data.error) {
+					$rootScope.errorForm = data.error;
+				}
+				$rootScope.success = "";
+			} else {
+				$scope.formData = {};
+				// clear the form so our user is ready to enter another
+				$scope.
+					newsletter = data;
+
+				AlertService.add('succes', 'Félicitation !', 'la création de l\'événement est un succès.');
+				$scope.goToState('core.events');
+			}
+		}, function (error) {
+			AlertService.add('succes', 'Erreur !', 'Une erreur a empeché la création de l\'évenement, merci de réessayer.');
+		});
+	}
+
+
+
+	$scope.submit = function() {
+		if($scope.update == true) {
+			$scope.updateEvent();
+		} else {
+			$scope.create();
+		}
+	}
+});
 
 app.controller('EventsDetailsCtrl', function ($scope) {
 	//Récupération de l'événement
@@ -634,7 +1343,76 @@ app.controller('PartyCtrl', function ($scope) {})
 app.controller('ParamsCtrl',  function ($scope) {
 
 })
-app.controller('RankCtrl', function ($scope) {})
+app.controller('RankCtrl', function ($scope, User, AlertService, $q, $stateParams) {
+
+	var friends = $stateParams.userId;
+	if(friends) {
+		$scope.friends = true;
+	} else {
+		$scope.friends = false;
+	}
+	$scope.limit = 20;
+	$scope.offset = 0;
+
+	var tokenTmp = $scope.getStorageToken();
+
+	tokenTmp.then(function(token) {
+		var tempUser = User.isLoggedIn.isLoggedIn({access_token: token});
+		tempUser.$promise.then(function (result) {
+			if(!result.isLoggedIn){
+				AlertService.add('error', 'Attention !', 'Veuillez vous identifier avant d\'acceder au jeu');
+				$scope.goToState('auth.login');
+			}else {
+				$scope.user = result.user;
+				$scope.initialize();
+			}
+		})
+	});
+
+
+	$scope.initialize = function () {
+		$scope.ranking = [];
+		$scope.getRanks($scope.offset);
+	}
+
+	$scope.getRanks = function (offset) {
+
+		var ranking  = User.getRanking($scope.friends, $scope.limit, $scope.offset).success(function(data) {
+			if(!data.success) {
+				AlertService.add('error', 'Attention !', data.error);
+			} else {
+				var promises = [];
+				for(var i = 0 ; i < data.users.length; i++) {
+					var t = function (i) {
+						var deferred = $q.defer();
+						var level = User.getLevelUser(data.users[i]);
+						level.then(function (l){
+							var level = l;
+							level.pourc = ((data.users[i].exp -level.level.begin)/ (level.nextLevel.begin - level.level.begin)) * 100;
+							var user = {
+								user : data.users[i],
+								level : level
+
+							}
+							deferred.resolve(user);
+						});
+						promises.push(deferred.promise);
+					}(i);
+
+				}
+				//Une fois que toutes les promesses sont résolues
+				$q.all(promises).then(function(result) {
+					$scope.ranking= $scope.ranking.concat(result);
+				} , function (reason) {
+					//On affiche l'erreur en console (DEV MOD)
+					console.error(reason);
+				})
+			}
+
+		});
+	}
+
+})
 app.controller('RulesCtrl', function ($scope) {})
 
 /************************/
@@ -650,11 +1428,9 @@ app.controller('AuthCtrl', function($scope, $state, $rootScope, User, CURRENTUSE
     }
 
     var tokenTmp = $scope.getStorageToken();
-
     tokenTmp.then(function(token){
     	$scope.verifToken(token);
     }, function(err){
-    	console.log("error dans le getStorageToken");
     	AlertService.add('error', 'Error !', 'Veuillez contacter le support du jeu.');
 		$scope.goToState('auth.login');
     })
@@ -742,11 +1518,9 @@ app.controller('AuthRegisterCtrl', function($scope, $state, User, AlertService) 
 app.controller('AuthForgotCtrl', function($scope, $state, User, AlertService) {	
 
 	$scope.forgot = function(email){
-		console.log("email: ", email);
 		if(email){
 			var promise = User.forgot.resetPassword({email : email});
 			promise.$promise.then(function(result) {
-				console.log("result: ",result);
 				if(result.error) {
 					AlertService.add('error', 'Attention !', result.error);
 				} else if(result.user) {

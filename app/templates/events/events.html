@@ -1,17 +1,65 @@
-<ion-view title="Dashboard">
-  <ion-content class="has-header padding">
-    <h1>Dash</h1>
+<ion-view title="evenements">
+  <ion-content class="has-header eventList" scroll="false">
+    <ion-tabs class="tabs-dark tabs-icon-only">
+      <ion-tab title="Liste" icon="ion-navicon-round" href="#/events">
+
+        <div class="tabs-striped tabs-top tabs-background-positive tabs-color-green">
+          <div class="tabs">
+            <a class="tab-item" ng-class="{active : !myEvent}" href="#/events">
+              Tous
+            </a>
+            <a ng-if="user.user.prenium" ng-class="{active : myEvent}"   class="tab-item" href="#/myEvents/{{user.user.id}}">
+             Créés
+            </a>
+          </div>
+        </div>
+
+          <ion-view view-title="Liste">
+            <ion-content scroll="true" >
+              <div class="tabContent">
+            <ul>
+              <li ng-repeat="e in events" class="event">
+                <a class="infosEvent" href="#/event/{{ e.event.id}}">
+                  <div class="dateEvent">
+                    {{ e.event.created | date:'dd-MM-yyyy'}} <br/>
+                    {{ e.event.created | date:'HH:mm'}}
+                  </div>
+                  <div class="title">
+                    <h2>{{ e.event.title }}</h2>
+
+                  </div>
+                  <div class="participantsEvent">
+                    {{ e.participants.length }} / {{ e.event.max_players }}
+                  </div>
+                </a>
+                <div class="clear"></div>
+                <div class="mapEvent">
+                  <div class="containerMap">
+                    <h3>{{e.coords.address}}</h3>
+                    <map center="{{ e.coords.posX }}, {{ e.coords.posY }}"
+                         zoom="8"
+                         disable-default-u-i="true"
+                         disable-double-click-zoom="false"
+                         draggable="false"
+                         draggable-cursor="finger"
+                         dragging-cursor="move"
+                         keyboard-shortcuts="false"
+                         max-zoom="20"
+                         min-zoom="2"
+                         tilt="45">
+                    </map>
+                  </div>
+                </div>
+              </li>
+            </ul>
+              </div>
+            </ion-content>
+          </ion-view>
+      </ion-tab>
+      <ion-tab ng-if="user.user.prenium" title="Ajout" icon="ion-plus" href="#/events/add">
+
+      </ion-tab>
+
+    </ion-tabs>
   </ion-content>
 </ion-view>
-
-<ion-footer-bar align-title="left" class="bar-dark">
-  <div class="buttons">
-    <button class="button">Left Button</button>
-  </div>
-
-  <h1 class="title">Title!</h1>
-  
-  <div class="buttons" ng-click="doSomething()">
-    <button class="button">Right Button</button>
-  </div>
-</ion-footer-bar>
