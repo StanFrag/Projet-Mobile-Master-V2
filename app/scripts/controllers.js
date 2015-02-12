@@ -558,16 +558,14 @@ app.controller('EventCtrl', function ($scope, User, Event, $stateParams, $q) {
 			for(var p = data.event.participants.length -1; p >= 0; p-- ) {
 				var getLevel = function(p) {
 					//Récupération du level de l'utilisateur via l'api
-					User.getLevelUser(data.event.participants[p].user).then(function(result) {
+					User.getLevelUser(data.event.participants[p].user).then(function (result) {
 						$scope.isParticiped = false;
-						console.log(result)
 						data.event.participants[p].user.level = result.level;
-						if(data.event.participants[p].user.id == $scope.user.user.id) {
+						if (data.event.participants[p].user.id == $scope.user.user.id) {
 							$scope.isParticiped = true;
 						}
 					});
-				}(p);
-
+				}(p)
 			}
 
 			$scope.compte_a_rebours();
@@ -619,7 +617,15 @@ app.controller('EventCtrl', function ($scope, User, Event, $stateParams, $q) {
 
 });
 
-app.controller('EventsCtrl', function ($scope, User, Event, $ionicLoading, AlertService, $http, $q) {
+app.controller('EventsCtrl', function ($scope, User, Event, $ionicLoading, AlertService, $http, $q, $stateParams) {
+
+	var userId = $stateParams.userId;
+
+	if(userId) {
+		$scope.myEvent = true;
+	} else {
+		$scope.myEvent = false;
+	}
 
 	//Initialisation du tableau d'événements
 	$scope.events = [];
@@ -656,11 +662,15 @@ app.controller('EventsCtrl', function ($scope, User, Event, $ionicLoading, Alert
 
 	//Fonction de récupération des événements
 	$scope.getEvents = function(limit, offset, filter, hisEvents) {
-		if(hisEvents) {
-			var id = $scope.user.id;
-		}
 
-		var promiseEvents = Event.user.get({limit : limit, offset : offset, filter : filter, id : id});
+		if($scope.myEvent) {
+
+			var id = $scope.user.user.id;
+			var promiseEvents = Event.user.getUserEvents({id : id, limit : limit, offset : offset, filter : filter});
+		} else {
+			var promiseEvents = Event.user.get({limit : limit, offset : offset, filter : filter});
+
+		}
 		promiseEvents.$promise.then(function(data) {
 			if(data.success) {
 				var deferred = $q.defer();
