@@ -33,6 +33,9 @@ angular.module('Guntherandthehunters.services', [])
         method: 'GET' 
       }
     }),
+      getRanking : function(friends, limit, offset) {
+        return $http.get(ENV.apiEndpoint + 'api/ranking?friends='+friends+'&limit='+ limit + '&offset=' + offset);
+      },
       getLevelUser : function(u) {
           var deferred = $q.defer();
           $http.get(ENV.apiEndpoint + '/json/levels.json').success(function(data){

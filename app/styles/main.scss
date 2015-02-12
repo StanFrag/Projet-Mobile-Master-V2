@@ -128,7 +128,7 @@ h1{
 /**************************/
 /********** EVENT **********/
 /**************************/
-.ficheEvent {
+.ficheEvent,  {
   background-color: white;
 
   .tabs {
@@ -138,6 +138,21 @@ h1{
     a {
       text-transform: uppercase;
       color : white;
+    }
+  }
+}
+
+.rankTab {
+  .tabs {
+    .isParticiped {
+      color : $green;
+    }
+    a {
+      text-transform: uppercase;
+    }
+    .tab-item-active {
+      color : white!important;
+
     }
   }
 }

@@ -1,0 +1,23 @@
+{
+  "boutons": [{
+    "text": "Carte",
+    "link": "core.map"
+  },
+  {
+    "text": "Evenements",
+    "link": "core.events"
+  },
+  {
+    "text": "Classement",
+    "link": "core.rank"
+  },
+  {
+    "text": "Regles",
+    "link": "core.rules"
+  },
+  {
+    "text": "Deconnexion",
+    "link": "auth.login",
+    "ng-click": "$scope.disconnect()"
+  }], "count": 5
+}

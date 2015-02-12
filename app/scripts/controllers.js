@@ -131,7 +131,6 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPla
 					if(event.success) {
 						$scope.event = event.event;
 						var pos = new google.maps.LatLng(event.event.coords.posX, event.event.coords.posY);
-						console.log($scope.map)
 						$scope.map.setCenter(pos);
 						var eventOptions = {
 							strokeColor: '#A2C539',
@@ -148,7 +147,6 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPla
 						$scope.perimeter =  new google.maps.Circle(eventOptions);
 					} else {
 						AlertService.add('error', 'Attention !', event.error);
-						//error
 					}
 				});
 			}
@@ -333,139 +331,13 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPla
 
 		}, function(error){
 			//alert('code: '    + error.code    + '\n' + 'message: ' + error.message + '\n');
-			console.log(error)
+			$ionicLoading.hide();
 		}, { 
 			maximumAge: 5000,
-			timeout: 10000, 
+			timeout: 8000,
 			enableHighAccuracy: true 
 		}
 	);
-
-    /*
-    // Une fois que la map a bien été initialisé
-	$scope.$on('mapInitialized', function(event, map) {
-		//Récuperation du style de map en json
-		$http.get('../json/mapStyle.json').success(function(data){
-			// Création du style de la map
-	    	var roadGuntherStyles = data;
-	    	var styledMapOptions = {name: 'FR Gunther style'};
-			var frMapGuntherStyle = new google.maps.StyledMapType(roadGuntherStyles, styledMapOptions);
-			// Ajout du style de la map
-			map.mapTypes.set('frguntherstyle', frMapGuntherStyle);
-			map.setMapTypeId('frguntherstyle');
-			// Ajout de la map
-			$scope.map = map;
-			// Fonction de geolocalisation du player
-			$scope.initiatePlayer();
-	    });
-	});
-
-	// Ajout d'un nouveau marker
-	$scope.addPlayer= function(x,y){
-		$scope.player = [{
-			posX:x,
-			posY:y,
-			icone:
-	            {
-		            path:'CIRCLE', 
-		            fillColor: '#95DE42', 
-		            scale: 10, 
-		            fillOpacity:1, 
-		            strokeColor:'#1D1D1D',
-		            strokeOpacity:0.5,
-		            strokeWeight:3
-	            },
-	        anim:'DROP',
-	        click: ''
-         }];
-	}
-
-	// Ajout d'un nouveau marker
-	$scope.addEnnemy= function(){
-		//Récuperation des ennemies
-		$http.get('../json/ennemy.json').success(function(data){
-			$scope.ennemy = data;
-	    });
-	}
-
-	// Centrer la map et le joueur sur la position géolocalisé
-	$scope.centerOnMe= function(){
-		var tmpPos = $scope.positionsPlayer.length - 1;
-		var pos = new google.maps.LatLng($scope.positionsPlayer[tmpPos].lat, $scope.positionsPlayer[tmpPos].lng);
-		//$scope.activeItem[0];
-		$scope.map.setCenter(pos);
-	}
-
-	// Centrer la map et le joueur sur la position géolocalisé
-	$scope.initiatePlayer= function(){
-
-		// On affiche la barre de chargement
-		$ionicLoading.show({
-			template: 'Loading...'
-		});
-
-		// Une fois que la plateforme ionic est prete
-		$ionicPlatform.ready(function() {
-			// On recherche la position actuel de l'utilisateur
-			navigator.geolocation.getCurrentPosition(function(position) {
-				// On crée une nouvelle position google map
-				var pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-				// On retire du tableau des markers le marker du joueur precedent
-				$scope.ennemy = [];
-				// On rerajoute le joueur a sa nouvelle position
-				$scope.addPlayer(position.coords.latitude,position.coords.longitude);
-				$scope.map.setCenter(pos);
-				// On rerajoute le joueur a sa nouvelle position
-				$scope.addEnnemy();
-				// On push ces positions dans le tableau de position
-				$scope.positionsPlayer.push({lat: pos.k,lng: pos.B});
-				// On cache la barre de chargement
-				$ionicLoading.hide();				
-			}, function(error){
-				// Si les données de géolocalisation sont inexistante ou desactivé, on previens l'utilisateur
-				alert('code: ' + error.code + '\n' + 'message: ' + error.message + '\n');
-				// On cache la barre de chargement
-				$ionicLoading.hide();
-			});
-		});
-	}
-
-	navigator.geolocation.watchPosition(function(position) {
-		if($scope.map.markers[0] != undefined){
-			var pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-			$scope.movePlayer(pos);
-			$scope.sendPlayerPosition();
-		}
-	}, function(error){
-		alert('code: '    + error.code    + '\n' + 'message: ' + error.message + '\n');
-	},{ maximumAge: 5000, timeout: 10000, enableHighAccuracy: true });
-
-	$scope.movePlayer = function(pos){
-		var tmpObj = $scope.map.markers[0];
-		$scope.positionsPlayer.push({lat: pos.k,lng: pos.B});
-        tmpObj.animateTo(
-        	pos, 
-			{
-				easing: 'linear', 
-				duration: 3000,
-				complete: function(){
-					$scope.map.setCenter(pos);
-				}
-            });
-	}	
-
-	/*******   Modal  *******/
-
-	/*
-	// Recuperation du template du modal
-	$ionicModal.fromTemplateUrl('view/chat/tchat.html', function($ionicModal) {
-		// On injecte le modal dans la scope
-		$scope.modal = $ionicModal;
-	},{
-		scope: $scope,
-		animation: 'slide-in-up'
-	});
-	*/
 
 	/*******   Footer de la Map  *******/
 
@@ -591,7 +463,7 @@ app.controller('ParticipateCtrl', function ($scope, User, Event, $stateParams, A
 
 app.controller('EventCtrl', function ($scope, User, Event, $stateParams, $q) {
 
-
+	$scope.actualisation;
 	$scope.compte_a_rebours = function()
 	{
 		var date_evenement = new Date($scope.e.event.created);
@@ -676,7 +548,7 @@ app.controller('EventCtrl', function ($scope, User, Event, $stateParams, $q) {
 			compte_a_rebours.innerHTML = 'Événement terminé.';
 		}
 
-		var actualisation = setTimeout(function(){ $scope.compte_a_rebours(); }, 1000);
+		$scope.actualisation = setTimeout(function(){ $scope.compte_a_rebours(); }, 1000);
 	}
 	$scope.initialize = function() {
 		var eventId = $stateParams.id;
@@ -688,17 +560,11 @@ app.controller('EventCtrl', function ($scope, User, Event, $stateParams, $q) {
 					//Récupération du level de l'utilisateur via l'api
 					User.getLevelUser(data.event.participants[p].user).then(function(result) {
 						$scope.isParticiped = false;
-						console.log($scope.user.id)
+						console.log(result)
+						data.event.participants[p].user.level = result.level;
 						if(data.event.participants[p].user.id == $scope.user.user.id) {
 							$scope.isParticiped = true;
 						}
-						//récupération du level en cours
-						data.event.participants[p].user.level = result.level;
-						//Récupération du niveau suivant
-						data.event.participants[p].user.nextLevel = result.nextLevel;
-						//Calcul du pourcentage avant le niveau suivant
-						data.event.participants[p].user.pourc =  ((data.event.participants[p].user.exp - data.event.participants[p].user.level.begin)/ (data.event.participants[p].user.nextLevel.begin - data.event.participants[p].user.level.begin)) * 100;
-
 					});
 				}(p);
 
@@ -707,6 +573,9 @@ app.controller('EventCtrl', function ($scope, User, Event, $stateParams, $q) {
 			$scope.compte_a_rebours();
 		});
 	}
+	$scope.$on('$destroy', function(){
+		clearTimeout($scope.actualisation);
+	});
 	$scope.getStorageToken = function(){
 		var deferred = $q.defer();
 		deferred.resolve(localStorage.getItem('token'));
@@ -810,18 +679,9 @@ app.controller('EventsCtrl', function ($scope, User, Event, $ionicLoading, Alert
 									deferred.resolve(event);
 
 								} else {
-									alert("Geocode was not successful for the following reason: " + status);
+									console.log("Geocode was not successful for the following reason: " + status);
 								}
 							});
-							/*var address = $http.get(url+"location="+event.coords.posX+"&,"+event.coords.posY);
-							address.then(function(data) {
-
-								console.log(data)
-							})*/
-								/*.$promise.then(function(data) {
-									console.log(data);
-									deferred.resolve(event);
-								})*/
 							return defer2.promise;
 						}(events[i])
 
@@ -1196,9 +1056,7 @@ app.controller('AddEventCtrl', function(AlertService, $scope, $http, Event, User
 
 
 	$scope.create = function() {
-		console.log($scope.event)
 		var user = $scope.user.user;
-		console.log(user)
 		var event = Event.user.create({
 			user_id : user.id,
 			title : $scope.event.title,
@@ -1340,7 +1198,77 @@ app.controller('PartyCtrl', function ($scope) {})
 app.controller('ParamsCtrl',  function ($scope) {
 
 })
-app.controller('RankCtrl', function ($scope) {})
+app.controller('RankCtrl', function ($scope, User, AlertService, $q, $stateParams) {
+
+	var friends = $stateParams.userId;
+	if(friends) {
+		$scope.friends = true;
+	} else {
+		$scope.friends = false;
+	}
+	$scope.limit = 20;
+	$scope.offset = 0;
+
+	var tokenTmp = $scope.getStorageToken();
+
+	tokenTmp.then(function(token) {
+		var tempUser = User.isLoggedIn.isLoggedIn({access_token: token});
+		tempUser.$promise.then(function (result) {
+			if(!result.isLoggedIn){
+				AlertService.add('error', 'Attention !', 'Veuillez vous identifier avant d\'acceder au jeu');
+				$scope.goToState('auth.login');
+			}else {
+				$scope.user = result.user;
+				$scope.initialize();
+			}
+		})
+	});
+
+
+	$scope.initialize = function () {
+		$scope.ranking = [];
+		$scope.getRanks($scope.offset);
+	}
+
+	$scope.getRanks = function (offset) {
+
+		var ranking  = User.getRanking($scope.friends, $scope.limit, $scope.offset).success(function(data) {
+			console.log(data)
+			if(!data.success) {
+				AlertService.add('error', 'Attention !', data.error);
+			} else {
+				var promises = [];
+				for(var i = 0 ; i < data.users.length; i++) {
+					var t = function (i) {
+						var deferred = $q.defer();
+						var level = User.getLevelUser(data.users[i]);
+						level.then(function (l){
+							var level = l;
+							level.pourc = ((data.users[i].exp -level.level.begin)/ (level.nextLevel.begin - level.level.begin)) * 100;
+							var user = {
+								user : data.users[i],
+								level : level
+
+							}
+							deferred.resolve(user);
+						});
+						promises.push(deferred.promise);
+					}(i);
+
+				}
+				//Une fois que toutes les promesses sont résolues
+				$q.all(promises).then(function(result) {
+					$scope.ranking= $scope.ranking.concat(result);
+				} , function (reason) {
+					//On affiche l'erreur en console (DEV MOD)
+					console.error(reason);
+				})
+			}
+
+		});
+	}
+
+})
 app.controller('RulesCtrl', function ($scope) {})
 
 /************************/

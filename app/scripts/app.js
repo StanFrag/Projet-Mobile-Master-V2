@@ -103,6 +103,11 @@ angular.module('Guntherandthehunters', ['ngResource', 'ionic', 'config', 'Gunthe
       controller : 'RankCtrl',
       templateUrl: 'templates/rank/rank.html'
     })
+    .state('core.rankFriend', {
+      url: "/rankFriend/:userId",
+      controller : 'RankCtrl',
+      templateUrl: 'templates/rank/rank.html'
+    })
 
     .state('core.rules', {
       url: "/rules",
