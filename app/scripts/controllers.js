@@ -255,6 +255,33 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPop
 								socket.on('posCreated', function(data) {
 									$scope.posPlayers.push(data);
 								});
+
+								/*******   LOCALISE AN EVENT  *******/
+								var eventId = $stateParams.eventId;
+								if(eventId) {
+									Event.user.get({eventId : eventId}).$promise.then(function(event) {
+										if(event.success) {
+											$scope.event = event.event;
+											var pos = new google.maps.LatLng(event.event.coords.posX, event.event.coords.posY);
+											$scope.map.setCenter(pos);
+											var eventOptions = {
+												strokeColor: '#A2C539',
+												strokeOpacity: 0.4,
+												strokeWeight: 2,
+												fillColor: '#A2C539',
+												fillOpacity: 0.35,
+												map: $scope.map,
+												center: pos,
+												radius: $scope.event.event.distance,
+												editable : false,
+												draggable : false
+											};
+											$scope.perimeter =  new google.maps.Circle(eventOptions);
+										} else {
+											AlertService.add('error', 'Attention !', event.error);
+										}
+									});
+								}
 						    });
 							
 				  		}
@@ -281,32 +308,7 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPop
 			}
 	    }
 
-		/*******   LOCALISE AN EVENT  *******/
-		var eventId = $stateParams.eventId;
-		if(eventId) {
-			Event.user.get({eventId : eventId}).$promise.then(function(event) {
-				if(event.success) {
-					$scope.event = event.event;
-					var pos = new google.maps.LatLng(event.event.coords.posX, event.event.coords.posY);
-					$scope.map.setCenter(pos);
-					var eventOptions = {
-						strokeColor: '#A2C539',
-						strokeOpacity: 0.4,
-						strokeWeight: 2,
-						fillColor: '#A2C539',
-						fillOpacity: 0.35,
-						map: $scope.map,
-						center: pos,
-						radius: $scope.event.event.distance,
-						editable : false,
-						draggable : false
-					};
-					$scope.perimeter =  new google.maps.Circle(eventOptions);
-				} else {
-					AlertService.add('error', 'Attention !', event.error);
-				}
-			});
-		}
+
 	    // Calcul de la proximité entre deux utilisateurs
 	    $scope.ennemyIsProxim = function(obj1,obj2){
 	    	var deferred = $q.defer(); 
@@ -754,7 +756,6 @@ app.controller('EventCtrl', function ($scope, User, Event, $stateParams, $q) {
 });
 
 app.controller('EventsCtrl', function ($scope, User, Event, $ionicLoading, AlertService, $http, $q, $stateParams) {
-
 	var userId = $stateParams.userId;
 
 	if(userId) {
@@ -865,6 +866,13 @@ app.controller('EventsCtrl', function ($scope, User, Event, $ionicLoading, Alert
 	$scope.getMoreEvents = function() {
 
 	}
+
+	$scope.getStorageToken = function(){
+		var deferred = $q.defer();
+		deferred.resolve(localStorage.getItem('token'));
+		return deferred.promise;
+	}
+
 	var tokenTmp = $scope.getStorageToken();
 
 	tokenTmp.then(function(token){
@@ -898,7 +906,13 @@ app.controller('EventsCtrl', function ($scope, User, Event, $ionicLoading, Alert
 
 })
 
-app.controller('AddEventCtrl', function(AlertService, $scope, $http, Event, User, $stateParams, $ionicSideMenuDelegate) {
+app.controller('AddEventCtrl', function(AlertService, $scope, $http, Event, User, $stateParams, $ionicSideMenuDelegate, $q) {
+	$scope.getStorageToken = function(){
+		var deferred = $q.defer();
+		deferred.resolve(localStorage.getItem('token'));
+		return deferred.promise;
+	}
+
 	var tokenTmp = $scope.getStorageToken();
 
 	tokenTmp.then(function(token) {
@@ -1353,7 +1367,11 @@ app.controller('RankCtrl', function ($scope, User, AlertService, $q, $stateParam
 	}
 	$scope.limit = 20;
 	$scope.offset = 0;
-
+	$scope.getStorageToken = function(){
+		var deferred = $q.defer();
+		deferred.resolve(localStorage.getItem('token'));
+		return deferred.promise;
+	}
 	var tokenTmp = $scope.getStorageToken();
 
 	tokenTmp.then(function(token) {
