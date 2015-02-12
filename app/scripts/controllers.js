@@ -65,7 +65,9 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPop
 	$scope.markers = [];
 
 	// Tableau des alertes de duels
-	$scope.alertDuel = [{titi:"toto"}];
+	$scope.alertDuel = [];
+
+	$scope.data = {};
 
 	// Tableau de données de position
 	$scope.positionsPlayer = [];
@@ -264,7 +266,9 @@ app.controller('MapCtrl', function($scope, $ionicModal, $ionicLoading, $ionicPop
 	  	}
 
 	  	$scope.addPopDuel = function(){
-
+	  		var obj = {id:0, type: "proxy", button:"toto", message:"Vous pouvez engager un duel avec ce joueur"};
+	  		$scope.alertDuel.push(obj);
+	  		console.log($scope.alertDuel);
 	  	};
 
 		// Creation d'une animation de marker

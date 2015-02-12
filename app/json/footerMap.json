@@ -2,21 +2,21 @@
   "boutons": [
   {
     "titre":"Chat", 
-    "icone":"ion-chatbubbles", 
-    "clickAction":"modal.show();activeItem(0)", 
-    "id":0
+    "icone":"ion-chatbubbles",
+    "id":0,
+    "clickAction":"modal.show();activeItem(0)"
   },
   {
     "titre":"Recentrer", 
     "icone":"ion-pinpoint", 
-    "clickAction":"centerOnMe();activeItem(1)", 
-    "id":1
+    "id":1,
+    "clickAction":"centerOnMe();activeItem(1)"
   },
   {
     "titre":"Favorites", 
     "icone":"ion-gear-a", 
-    "clickAction":"activeItem(2)",
-    "id":2
+    "id":2,
+    "clickAction":"activeItem(2)"
   }
-  ], "count":4
+  ], "count":3
 }
