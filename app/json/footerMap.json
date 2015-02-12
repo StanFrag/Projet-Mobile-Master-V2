@@ -1,30 +1,22 @@
 {
-  "boutons": [{
-    "titre":"Recentrer", 
-    "icone":"ion-pinpoint", 
-    "classe":"tab-item", 
-    "clickAction":"centerOnMe();activeItem(0)", 
-    "id":0
-    },
+  "boutons": [
   {
     "titre":"Chat", 
     "icone":"ion-chatbubbles", 
-    "classe":"tab-item", 
-    "clickAction":"modal.show();activeItem(1)", 
+    "clickAction":"modal.show();activeItem(0)", 
+    "id":0
+  },
+  {
+    "titre":"Recentrer", 
+    "icone":"ion-pinpoint", 
+    "clickAction":"centerOnMe();activeItem(1)", 
     "id":1
   },
   {
     "titre":"Favorites", 
-    "icone":"ion-star", 
-    "classe":"tab-item", 
+    "icone":"ion-gear-a", 
     "clickAction":"activeItem(2)",
     "id":2
-  },
-  {
-    "titre":"Settings", 
-    "icone":"ion-gear-a", 
-    "classe":"tab-item", 
-    "clickAction":"activeItem(3)", 
-    "id":3
-    }], "count":4
+  }
+  ], "count":4
 }

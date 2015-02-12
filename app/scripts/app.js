@@ -111,6 +111,10 @@ angular.module('Guntherandthehunters', ['ngResource', 'ionic', 'config', 'Gunthe
   $urlRouterProvider.otherwise('/map');
 })
 
-.value('CURRENTUSER',{})
+.value('CURRENTUSER',{
+  id: null,
+  name:null,
+  token:null
+})
 .value('SOCKET_URL','localhost:3000')
 

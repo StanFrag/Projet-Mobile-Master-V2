@@ -31,7 +31,7 @@
 
 		<ion-content has-header="true">
 			<ion-list>
-				<ion-item ng-click="goToState(item.link)" class="item item-icon-left listItemMenu" ng-repeat="item in list" menu-close>
+				<ion-item ng-click="{{item.link}}" class="item item-icon-left listItemMenu" ng-repeat="item in list" menu-close>
 					<!-- <i ng-class="item.iconClass"></i> -->
 					{{item.text}}
 				</ion-item>

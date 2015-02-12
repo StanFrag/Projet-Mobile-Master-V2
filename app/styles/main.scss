@@ -319,4 +319,14 @@ tab-item:active{
   background-color: white;
 }
 
+#alertDuelButton{
+  position: absolute;
+  top:10px;
+  right:10px;
+  font-size: 2em !important;
+  color:orange;
+  padding:0 !important;
+  z-index:1000 !important;
+}
+
 

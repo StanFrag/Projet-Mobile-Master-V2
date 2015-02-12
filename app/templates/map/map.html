@@ -11,30 +11,26 @@
             keyboard-shortcuts="false"
             max-zoom="20"
             min-zoom="12"
-            tilt="45">
-        <marker ng-repeat="infoPlayer in player"
-          position="{{infoPlayer.posX}},{{infoPlayer.posY}}" 
-          icon="{{infoPlayer.icone}}"
-          on-click="{{infoPlayer.click}}"
-          animation="{{infoPlayer.anim}}"
+            tilt="45"
+            id="map-canvas">
+        <marker ng-repeat="info in markers"
+          position="{{info.posX}},{{info.posY}}" 
+          icon="{{info.icone}}"
+          on-click="{{info.click}}"
+          animation="{{info.anim}}"
           draggable="false"
-          class="player">
-        <marker ng-repeat="infoEnnemy in ennemy"
-          position="{{infoEnnemy.posX}},{{infoEnnemy.posY}}" 
-          icon="{{infoEnnemy.icone}}"
-          on-click="{{infoEnnemy.click}}"
-          animation="{{infoEnnemy.anim}}"
-          draggable="false"
-          id="{{infoEnnemy.id}}">
+          id="{{info.id}}">
         </marker>
       </map> 
+     
     </div>
+     <button id="alertDuelButton" class="button button-dark icon ion-alert-circled" ng-click="showPopup()" ng-if="alertDuel"></button>
   </ion-content>
 </ion-view>
 
 <div class="tabs-striped tabs-background-dark tabs-color-assertive">
   <div class="tabs" >
-    <a ng-repeat="itemFooter in itemsFooter" class="{{itemFooter.classe}}" ng-click="{{itemFooter.clickAction}}">
+    <a ng-repeat="itemFooter in itemsFooter" class="tab-item" ng-class="{'active' : data.activeButton == {{itemFooter.id}}}" ng-click="{{itemFooter.clickAction}}">
       <i class="icon {{itemFooter.icone}}"></i>
       {{itemFooter.titre}}
     </a>

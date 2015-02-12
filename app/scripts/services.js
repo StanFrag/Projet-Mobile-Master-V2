@@ -54,7 +54,7 @@ angular.module('Guntherandthehunters.services', [])
             });
 
             if(typeof timeout == 'undefined') {
-                timeout = 800000;
+                timeout = 3000;
             }
 
             if (timeout) {
