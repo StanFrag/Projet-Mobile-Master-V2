@@ -80,9 +80,9 @@ angular.module('Guntherandthehunters', ['ngResource', 'ionic', 'config', 'Gunthe
         templateUrl: 'templates/events/add.html'
       })
     .state('core.profil', {
-      url: "/profil",
+      url: "/profil/:userId",
       controller : 'ProfilCtrl',
-      templateUrl: 'templates/events/events.html'
+      templateUrl: 'templates/profil/profil.html'
     })
 
     .state('core.friends', {

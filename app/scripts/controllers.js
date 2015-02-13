@@ -1431,7 +1431,76 @@ app.controller('RankCtrl', function ($scope, User, AlertService, $q, $stateParam
 	}
 
 })
-app.controller('RulesCtrl', function ($scope) {})
+app.controller('RulesCtrl', function ($scope) {});
+
+/**
+ * Affichage du profil utilisateur
+ */
+app.controller('ProfilCtrl', function ($scope, $stateParams, $q, User, AlertService) {
+	$scope.getStorageToken = function(){
+		var deferred = $q.defer();
+		deferred.resolve(localStorage.getItem('token'));
+		return deferred.promise;
+	}
+	var tokenTmp = $scope.getStorageToken();
+
+	tokenTmp.then(function(token) {
+		var tempUser = User.isLoggedIn.isLoggedIn({access_token: token});
+		tempUser.$promise.then(function (result) {
+			if(!result.isLoggedIn){
+				AlertService.add('error', 'Attention !', 'Veuillez vous identifier avant d\'acceder à cette page.');
+				$scope.goToState('auth.login');
+			}else {
+				$scope.user = result.user;
+				$scope.initialize();
+			}
+		})
+	});
+
+	$scope.initialize = function() {
+		$scope.profil = {};
+		var userId = $stateParams.userId;
+		$scope.getProfil(userId);
+	}
+
+	$scope.getProfil = function(userId) {
+		$scope.profil = User.getProfil.get({userId : userId}).$promise.then(function(data){
+			if(data.success) {
+				$scope.profil = data.user;
+				//Récupération du level de l'utilisateur via l'api
+				User.getLevelUser($scope.profil).then(function(data) {
+					//récupération du level en cours
+					$scope.profil.level = data.level;
+					//Récupération du niveau suivant
+					$scope.profil.nextLevel = data.nextLevel;
+					//Calcul du pourcentage avant le niveau suivant
+					$scope.pourc =  (($scope.profil.exp - $scope.profil.level.begin)/ ($scope.profil.nextLevel.begin - $scope.profil.level.begin)) * 100;
+				});
+			} else {
+				AlertService.add('error', 'Attention !', 'Le profil n\'a pas été trouvé.');
+
+			}
+		});
+
+	}
+	$scope.changeTab = function (tab) {
+		$('.boxContentProfil').addClass('hide');
+		$('.menuProfil').find('li').removeClass('active');
+		$('.'+tab).removeClass('hide');
+		$('.link-'+tab).parent().addClass('active')
+	}
+	$scope.addFriend = function() {
+		User.addFriend.post({userId : $scope.user.user.id, friendId : $scope.profil.id}).$promise.then(function(data) {
+			if(data.success) {
+				$scope.$apply(function () {
+					$scope.isFriend = data.isFriend;
+				});
+				AlertService.add('succes', data.msg);
+			}
+		});
+	}
+})
+
 
 /************************/
 /******** AUTH **********/

@@ -16,7 +16,7 @@
                         </div>
 
                         <div class="list">
-                            <a class="item RankElement" ng-repeat="(key, rank) in ranking | filter:searchText | orderBy:'user.exp':true">
+                            <a class="item RankElement" ng-repeat="(key, rank) in ranking | filter:searchText | orderBy:'user.exp':true" href="/#/profil/{{rank.user.id}}">
 
                                 <div class="row row-center">
                                     <div class="col col-10">
@@ -79,7 +79,8 @@
 
             </ion-tab>
 
-            <ion-tab title="Amis" href="#/rankFriend/{{user.user.id}}"><ion-view view-title="Liste">
+            <ion-tab title="Amis" href="#/rankFriend/{{user.user.id}}">
+                <ion-view view-title="Liste">
                 <ion-content scroll="true">
 
                     <div class="input-list-inset searchInput">
@@ -90,7 +91,7 @@
                     </div>
 
                     <div class="list">
-                        <a class="item RankElement" ng-repeat="(key, rank) in ranking | filter:searchText | orderBy:'user.exp':true">
+                        <a class="item RankElement" ng-repeat="(key, rank) in ranking | filter:searchText | orderBy:'user.exp':true" href="/#/profil/{{rank.user.id}}" >
 
                             <div class="row row-center">
                                 <div class="col col-10">

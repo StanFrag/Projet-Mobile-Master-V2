@@ -1,0 +1,122 @@
+<ion-view title="Profil">
+    <ion-content class="has-header ficheUser" scroll="false">
+        <ion-view title="ficheUser">
+            <ion-content class="" scroll="true">
+                <h1>{{ profil.username }}</h1>
+                <div class="containerProfil" >
+                    <div id="profile" class="animate">
+                        <div class="imgProfil">
+                            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                                     viewBox="0 0 345.954 345.951" style="enable-background:new 0 0 345.954 345.951;"
+                                     xml:space="preserve">
+                                <g id="fond">
+                                    <g>
+                                        <g>
+                                            <radialGradient id="SVGID_1_" cx="172.9771" cy="172.9756" r="172.9763" gradientUnits="userSpaceOnUse">
+                                                <stop  offset="0" style="stop-color:#000000"/>
+                                                <stop  offset="1" style="stop-color:#000000;stop-opacity:0"/>
+                                            </radialGradient>
+                                            <path style="fill:url(#SVGID_1_);" d="M345.954,172.976c0,95.534-77.444,172.976-172.977,172.976
+                                                C77.437,345.951,0,268.51,0,172.976C0,77.455,77.437,0,172.978,0C268.51,0,345.954,77.455,345.954,172.976z"/>
+                                        </g>
+                                        <g>
+                                            <path style="fill:#FFFFFF;" d="M330.955,172.976c0,87.25-70.729,157.976-157.978,157.976
+                                                c-87.257,0-157.979-70.726-157.979-157.976C14.999,85.737,85.721,15,172.978,15C260.226,15,330.955,85.737,330.955,172.976z"/>
+                                        </g>
+                                    </g>
+                                </g>
+                                <g id="color">
+                                    <g>
+                                        <path style="fill:{{profil.level.color}};" d="M315.862,172.976c0,78.915-63.972,142.884-142.885,142.884
+                                            c-78.92,0-142.886-63.969-142.886-142.884c0-78.903,63.966-142.884,142.886-142.884
+                                            C251.891,30.092,315.862,94.072,315.862,172.976z"/>
+                                    </g>
+                                </g>
+                                <g id="head">
+                                    <path style="fill:#FFFFFF;" d="M132.503,281.586c3.491-2.44,6.991-5.488,10.42-8.863c-0.069,5.369,0.074,10.631,0.435,15.637
+                                        c0.49,7.018,1.336,13.584,2.303,19.429c0.688,4.054,1.408,7.779,2.125,11.047h47.889c-5.773-8.743-10.464-17.368-14.237-25.684
+                                        c-1.866-4.137-3.5-8.179-4.946-12.155c-6.39-17.48-8.929-33.123-9.762-45.308c2.532-6.923,4.403-14.362,5.372-22.237
+                                        c1.503-12.322,4.449-20.357,7.449-25.637c4.699-8.196,9.586-9.666,9.586-9.666s17.622,4.439,30.64-1.036
+                                        c4.423-2.44,8.552-5.22,12.388-8.339c17.055-13.904,27.864-34.101,27.864-56.695c0-41.881-36.958-75.826-82.567-75.826
+                                        c-45.588,0-82.558,33.945-82.558,75.826c0,7.839,1.44,15.362,3.86,22.457c-4.418,5.167-0.051,15.846-0.051,15.846l0.093-0.054
+                                        c2.797-5.667,8.526-9.606,15.217-9.606c5.458,0,10.268,2.66,13.384,6.713c4.303-7.512,12.306-12.624,21.579-12.624
+                                        c13.78,0,24.958,11.154,24.958,24.958c0,13.785-11.178,24.957-24.958,24.957c-10.124,0-18.806-6.064-22.713-14.726
+                                        c-3.104,3.263-7.438,5.315-12.25,5.315c-2.232,0-4.346-0.471-6.295-1.244l-0.021,0.012c0,0,3.232,2.804,5.054,10.643
+                                        c1.05,4.506,4.053,7.875,7.05,7.78c1.212,15.393,2.792,38.464-33.877,36.684c0,0,9.613,10.173,22.327,13.755
+                                        c0,0-10.554,16.09,9.128,16.09c0,0,0.492,6.244-0.962,10.797C114.988,274.396,114.988,293.83,132.503,281.586z"/>
+                                </g>
+                            </svg>
+                            <a ng-if="!isMyFriend" class="actionFriend addFriend" ng-click="addFriend()"><span class="icon-plus"></span></a>
+                            <a ng-if="isMyFriend" class="actionFriend removeFriend" ng-click="addFriend()"><span class="icon-minus"></span></a>
+
+                            <div class="clear"></div>
+                        </div>
+                        <div class="barProgressionProfil">
+                            <div class="barProgressionProfilPointer" style="left:{{pourc}}%;">{{pourc | number:2}} %
+                                <div class="barProgressionProfilArrow">
+                                </div>
+                            </div>
+                            <div class="barProgressionProfilBg" style="background-color : {{profil.level.color}}; opacity : 0.8;"></div>
+                            <span style="display: block;height:100%;width : {{pourc}}%; background-color : {{profil.level.color}};">
+                                <p>{{profil.exp}} XP</p>
+                            </span>
+
+                        </div>
+                        <p class="actuaLlevel">
+                            Niveau {{profil.level.level}} : {{profil.level.name}}
+                        </p>
+                        <div class="menuProfil">
+                            <ul>
+                                <li class="active">
+                                    <a ng-click="changeTab('victories')" class="link-victories" title="Victoire">
+                                        <span class="icon-trophy"></span>
+                                        <p>221</p>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a ng-click="changeTab('friends')"  class="link-friends"  title="Amis">
+                                        <span class="icon-users"></span>
+                                        <p>25</p>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a ng-click="changeTab('time')"  class="link-time" title="Temps de jeu">
+                                        <span class="icon-clock"></span>
+                                        <p>35h</p>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a ng-click="changeTab('events')" class="link-events"  title="Evénements">
+                                        <span class="icon-calendar"></span>
+                                        <p>20</p>
+                                    </a>
+                                </li>
+                            </ul>
+                            <div class="clear"></div>
+                        </div>
+                        <div class="contentProfil">
+                            <div class="victories boxContentProfil">
+                                <h4>Victoires</h4>
+                                <p><span>221</span></p>
+                            </div>
+                            <div class="friends boxContentProfil hide">
+                                <h4>Amis</h4>
+                                <p><span>25</span> Amis</p>
+                            </div>
+                            <div class="time boxContentProfil hide">
+                                <h4>Temps passé</h4>
+                                <p><span>35</span> heures de jeu</p>
+                            </div>
+                            <div class="events boxContentProfil hide">
+                                <h4>Evénéments</h4>
+                                <p><span>20</span> créés</p>
+                                <p><span>45</span> participés</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </ion-content>
+        </ion-view>
+    </ion-content>
+</ion-view>

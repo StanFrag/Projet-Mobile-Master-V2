@@ -125,6 +125,198 @@ h1{
   clear: both;
 }
 
+
+/**************************/
+/********** PROFIL **********/
+/**************************/
+
+.ficheUser {
+  background-color: #ffffff;
+  
+  .imgProfil {
+    position: relative;
+    a {
+      padding : 15px;
+      background-color: #808080;
+      border-radius : 50%;
+      color : #f8f8ff;
+      margin-bottom: 10px;
+      float: left;
+      display: block;
+    }
+  }
+}
+
+.ficheUser h1{
+  font-size: 25px;
+  color : #1A2D4D;
+  background-color: $darkblue;
+  margin-bottom: 0 !important;
+  font-family: Arial;
+  color : white;
+  padding: 2px 0 10px 0;
+  font-weight: bold;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 15px 0;
+}
+
+#wrapper h1 {
+
+  border-bottom: 2px solid #e1e1e1;
+  margin-bottom: 40px;
+  padding-bottom : 30px!important;
+}
+
+.barProgressionProfil {
+  width: 80%;
+  padding : 0 10%;
+  height: 30px;
+  margin-bottom: 10px;
+  margin-top: 20px;
+  position: relative;
+}
+.barProgressionProfilBg {
+  width: 100%;
+  height: 100%;
+  position : absolute;
+}
+
+.barProgressionProfilPointer {
+  top : -22px;
+  position : absolute;
+  font-size: 0.7em;
+  opacity: 0.5;
+  padding-left: -10px;
+  margin-left: 10%;
+  min-width :48px;
+
+  text-align: center;
+
+}
+
+.barProgressionProfilArrow {
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+
+  border-top: 10px solid #1F201C;
+}
+
+.barProgressionProfil span {
+  position : absolute;
+}
+
+.barProgressionProfil span p{
+  color : white;
+  position : absolute;
+  top : 9px;
+  font-size: 0.8em;
+  width : 100%;
+  min-width: 78px;
+  text-align: center;
+}
+.actuaLlevel {
+  width : 100%;
+  text-align: center;
+  opacity: 0.8;
+  text-transform: uppercase;
+  font-size: 0.7em;
+  font-weight: bold;
+  margin: 15px 0;
+
+}
+
+.imgProfil {
+
+  background-color : #1A2D4D !important;
+  margin-bottom: 40px;
+  padding : 20px;
+}
+
+.imgProfil svg {
+  margin: 0 auto;
+  display: block;
+  width: 60%;
+}
+
+.menuProfil {
+
+  padding-top: 30px;
+  padding-bottom: 30px;
+  border-top: 2px solid #e1e1e1;
+  border-bottom: 2px solid #e1e1e1;
+}
+.menuProfil ul {
+  width : 100%;
+}
+.menuProfil ul li {
+  width : 25%;
+  display: block;
+  float: left;
+
+}
+
+.menuProfil ul li a {
+
+  color : #d5d5d5 !important;
+  display: block;
+  width: 100%;
+  text-align: center;
+  text-decoration: none !important;
+  font-size: 1.5em;
+  font-weight: bold;
+
+  -webkit-transition: color 1s;
+  -moz-transition: color 1s;
+  -o-transition: color 1s;
+  transition: color 1s;
+}
+
+.menuProfil ul li.active a {
+
+  color : #1A2D4D !important;
+}
+
+
+.menuProfil ul li a:hover {
+  color : #1A2D4D !important;
+  -webkit-transition: color 0.5s;
+  -moz-transition: color 0.5s;
+  -o-transition: color 0.5s;
+  transition: color 0.5s;
+}
+.menuProfil ul li p {
+  margin-top: 10px;
+  margin-bottom: 0!important;
+}
+
+.contentProfil {
+  margin-top: 30px;
+  margin-bottom: 30px;
+  text-align: center;
+  color : #1A2D4D;
+}
+
+.boxContentProfil h4 {
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 1.4em;
+  margin-bottom: 10px;
+}
+.boxContentProfil p {
+  font-size: 2em;
+
+}
+
+.boxContentProfil p span {
+  font-size: 1.3em;
+  text-transform: uppercase;
+  font-weight: bold;
+
+}
+
 /**************************/
 /********** EVENT **********/
 /**************************/

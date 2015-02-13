@@ -29,10 +29,20 @@ angular.module('Guntherandthehunters.services', [])
       }
     }),
     logout : $resource(ENV.apiEndpoint + 'api/logout', {}, {
-      'logout': {
-        method: 'GET' 
-      }
+        'logout': {
+            method: 'GET'
+        }
     }),
+    getProfil : $resource(ENV.apiEndpoint + 'api/getProfil', {}, {
+        'get': {
+            method: 'GET'
+        }
+    }),
+      addFriend : $resource(ENV.apiEndpoint + 'api/addFriend', {}, {
+          'post': {
+              method: 'POST'
+          }
+      }),
       getRanking : function(friends, limit, offset) {
         return $http.get(ENV.apiEndpoint + 'api/ranking?friends='+friends+'&limit='+ limit + '&offset=' + offset);
       },
